@@ -1,0 +1,419 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of extract_pairs</title>
+  <meta name="keywords" content="extract_pairs">
+  <meta name="description" content="Finds moments from two cevents that match a specified temporal relation">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; extract_pairs.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>extract_pairs
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Finds moments from two cevents that match a specified temporal relation</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [allpairs, events1_wo, events2_wo] = extract_pairs(events1, events2, timing_relation, mapping, args) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Finds moments from two cevents that match a specified temporal relation
+ 
+ This function will loop through all events from Variable1 (by either specifying a csv file 
+ or a variable name) and find those events in Variable2 that match the temporal  
+ relation given in the threshold parameter. These matches (or pairs)
+ are output in a resulting CSV file.
+ 
+ author: sbf@umail.iu.edu
+ 
+% Required Arguments
+ filename1
+       -- string, the full path or relative path to a
+          .mat or .csv file
+       -- data can either be cstream or cevent format
+       -- if .mat, data should be saved under sdata.data structure, like
+          in multiwork format
+       -- for .csv files, one can specify the number of headers and
+          columns, see the optional arguments below
+ filename2
+         -- see filename1
+ timing_relation
+         -- string of characters that indicate the temporal relations
+ 
+         on1 and off1 correspond to event1's onset and offset, respectively.
+         on2 and off2 correspond to event2's onset and offset, respectively.
+ 
+         'more(A,B,T)' means A comes before B with a gap more than T seconds.
+         'less(A,B,T)' means A comes before B with a gap less than T seconds.
+         A and B are to be replaced with any combination of on1, off1, on2,
+         and off2. T is optional, and if it is not provided, will not
+         consider the gap between A and B.
+ 
+         e.g.
+         timing_relation = 'more(on1, on2, 4)' means on1 must come before on2 in time,
+         with a gap of more than 4 seconds.
+         timing_relation = 'less(off2, on1, 2)' means off2 must come before on1 in time, with a
+         gap of less than 2 seconds.
+ 
+         Note, you can chain multiple timing relations together using '&amp;' or '|'. This
+         means AND and OR, respectively. Use parentheses to indicate
+         more complex timings.
+
+         e.g.  
+         timing_relation = 'more(on1, off1, 4) &amp; less(on1, on2, 2)' means events in
+         Variable1 must be greater than 4 seconds long, and must start at most
+         2 seconds before the events in Variable2
+ 
+ mapping
+         -- Nx2 array that indicates which categories are to be matched
+            together.
+ savefilename
+         -- string indicating where to save the CSV file. The folder
+            must exist.
+ 
+% Optional Arguments
+ args.pairtype
+         -- single-dimension array of integers whose length matches the
+            length of 'mapping'. Allows user to tag each row in 'mapping' to a type.
+ args.cevent_trials
+       -- string, the full path or relative path to a
+          .mat or .csv file
+       -- The timing information in this file is used to cut the data into
+          trials. Ultimately this ensures that events from one trial
+          cannot be paired with events from a second trial, even if the
+          temporal relation holds.
+ args.files_numheaders
+       -- integer array of size 2, indicating how many
+          headers are in filename1 and filename2, respectively
+       -- e.g. [1 1] for means to skip 1 header file for both
+ args.files_columns
+       -- cell array of size 2, one cell for each filename, indicating which columns
+          to grab from the .csv file
+       -- e.g. {[3 4 5], [6 7 8]} for the two filenames
+          [3 4 5] is for filename1, [6 7 8] is for filename2
+       -- if empty, just grab all columns
+ args.cevent_trials_numheaders
+       -- integer array of size 2, indicating how many
+          headers are in filename1 and filename2, respectively
+       -- e.g. [1 1] for means to skip 1 header file for both
+ args.cevent_trials_columns
+       -- 1x3 integer array indicating which columns
+          to grab from the .csv file
+       -- if empty, just grab all columns
+
+ The following arguments control many to many mapping
+ Consider the following many to many mapping from cev1 and cev2
+ 10, 15
+ 11, 15
+ 11, 16
+ 11, 17
+ To force 1 to 1 mapping, set either first_n_cev1 or last_n_cev1 to 1
+ args.first_n_cev1
+         -- integer indicating to only output first N pairings of cev 1
+ args.first_n_cev2
+         -- integer indicating to only output first N pairings of cev 2
+ args.last_n_cev1
+         -- integer indicating to only output last N pairings of cev 1
+ args.last_n_cev2
+         -- integer indicating to only output last N pairings of cev 2</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="timevp_extract_pairs.html" class="code" title="function [allpairs, events1_wo, events2_wo] = timevp_extract_pairs(filename1, filename2, timing_relation, savefilename, mapping, args)">timevp_extract_pairs</a>	Extracts pairs of events that fit a specified temporal condition</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function log = less(t1,t2,thres)</a></li><li><a href="#_sub2" class="code">function log = more(t1,t2,thres)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [allpairs, events1_wo, events2_wo] = extract_pairs(events1, events2, timing_relation, mapping, args)</a>
+0002 
+0003 <span class="comment">% Finds moments from two cevents that match a specified temporal relation</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% This function will loop through all events from Variable1 (by either specifying a csv file</span>
+0006 <span class="comment">% or a variable name) and find those events in Variable2 that match the temporal</span>
+0007 <span class="comment">% relation given in the threshold parameter. These matches (or pairs)</span>
+0008 <span class="comment">% are output in a resulting CSV file.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% author: sbf@umail.iu.edu</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%% Required Arguments</span>
+0013 <span class="comment">% filename1</span>
+0014 <span class="comment">%       -- string, the full path or relative path to a</span>
+0015 <span class="comment">%          .mat or .csv file</span>
+0016 <span class="comment">%       -- data can either be cstream or cevent format</span>
+0017 <span class="comment">%       -- if .mat, data should be saved under sdata.data structure, like</span>
+0018 <span class="comment">%          in multiwork format</span>
+0019 <span class="comment">%       -- for .csv files, one can specify the number of headers and</span>
+0020 <span class="comment">%          columns, see the optional arguments below</span>
+0021 <span class="comment">% filename2</span>
+0022 <span class="comment">%         -- see filename1</span>
+0023 <span class="comment">% timing_relation</span>
+0024 <span class="comment">%         -- string of characters that indicate the temporal relations</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%         on1 and off1 correspond to event1's onset and offset, respectively.</span>
+0027 <span class="comment">%         on2 and off2 correspond to event2's onset and offset, respectively.</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">%         'more(A,B,T)' means A comes before B with a gap more than T seconds.</span>
+0030 <span class="comment">%         'less(A,B,T)' means A comes before B with a gap less than T seconds.</span>
+0031 <span class="comment">%         A and B are to be replaced with any combination of on1, off1, on2,</span>
+0032 <span class="comment">%         and off2. T is optional, and if it is not provided, will not</span>
+0033 <span class="comment">%         consider the gap between A and B.</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">%         e.g.</span>
+0036 <span class="comment">%         timing_relation = 'more(on1, on2, 4)' means on1 must come before on2 in time,</span>
+0037 <span class="comment">%         with a gap of more than 4 seconds.</span>
+0038 <span class="comment">%         timing_relation = 'less(off2, on1, 2)' means off2 must come before on1 in time, with a</span>
+0039 <span class="comment">%         gap of less than 2 seconds.</span>
+0040 <span class="comment">%</span>
+0041 <span class="comment">%         Note, you can chain multiple timing relations together using '&amp;' or '|'. This</span>
+0042 <span class="comment">%         means AND and OR, respectively. Use parentheses to indicate</span>
+0043 <span class="comment">%         more complex timings.</span>
+0044 <span class="comment">%</span>
+0045 <span class="comment">%         e.g.</span>
+0046 <span class="comment">%         timing_relation = 'more(on1, off1, 4) &amp; less(on1, on2, 2)' means events in</span>
+0047 <span class="comment">%         Variable1 must be greater than 4 seconds long, and must start at most</span>
+0048 <span class="comment">%         2 seconds before the events in Variable2</span>
+0049 <span class="comment">%</span>
+0050 <span class="comment">% mapping</span>
+0051 <span class="comment">%         -- Nx2 array that indicates which categories are to be matched</span>
+0052 <span class="comment">%            together.</span>
+0053 <span class="comment">% savefilename</span>
+0054 <span class="comment">%         -- string indicating where to save the CSV file. The folder</span>
+0055 <span class="comment">%            must exist.</span>
+0056 <span class="comment">%</span>
+0057 <span class="comment">%% Optional Arguments</span>
+0058 <span class="comment">% args.pairtype</span>
+0059 <span class="comment">%         -- single-dimension array of integers whose length matches the</span>
+0060 <span class="comment">%            length of 'mapping'. Allows user to tag each row in 'mapping' to a type.</span>
+0061 <span class="comment">% args.cevent_trials</span>
+0062 <span class="comment">%       -- string, the full path or relative path to a</span>
+0063 <span class="comment">%          .mat or .csv file</span>
+0064 <span class="comment">%       -- The timing information in this file is used to cut the data into</span>
+0065 <span class="comment">%          trials. Ultimately this ensures that events from one trial</span>
+0066 <span class="comment">%          cannot be paired with events from a second trial, even if the</span>
+0067 <span class="comment">%          temporal relation holds.</span>
+0068 <span class="comment">% args.files_numheaders</span>
+0069 <span class="comment">%       -- integer array of size 2, indicating how many</span>
+0070 <span class="comment">%          headers are in filename1 and filename2, respectively</span>
+0071 <span class="comment">%       -- e.g. [1 1] for means to skip 1 header file for both</span>
+0072 <span class="comment">% args.files_columns</span>
+0073 <span class="comment">%       -- cell array of size 2, one cell for each filename, indicating which columns</span>
+0074 <span class="comment">%          to grab from the .csv file</span>
+0075 <span class="comment">%       -- e.g. {[3 4 5], [6 7 8]} for the two filenames</span>
+0076 <span class="comment">%          [3 4 5] is for filename1, [6 7 8] is for filename2</span>
+0077 <span class="comment">%       -- if empty, just grab all columns</span>
+0078 <span class="comment">% args.cevent_trials_numheaders</span>
+0079 <span class="comment">%       -- integer array of size 2, indicating how many</span>
+0080 <span class="comment">%          headers are in filename1 and filename2, respectively</span>
+0081 <span class="comment">%       -- e.g. [1 1] for means to skip 1 header file for both</span>
+0082 <span class="comment">% args.cevent_trials_columns</span>
+0083 <span class="comment">%       -- 1x3 integer array indicating which columns</span>
+0084 <span class="comment">%          to grab from the .csv file</span>
+0085 <span class="comment">%       -- if empty, just grab all columns</span>
+0086 <span class="comment">%</span>
+0087 <span class="comment">% The following arguments control many to many mapping</span>
+0088 <span class="comment">% Consider the following many to many mapping from cev1 and cev2</span>
+0089 <span class="comment">% 10, 15</span>
+0090 <span class="comment">% 11, 15</span>
+0091 <span class="comment">% 11, 16</span>
+0092 <span class="comment">% 11, 17</span>
+0093 <span class="comment">% To force 1 to 1 mapping, set either first_n_cev1 or last_n_cev1 to 1</span>
+0094 <span class="comment">% args.first_n_cev1</span>
+0095 <span class="comment">%         -- integer indicating to only output first N pairings of cev 1</span>
+0096 <span class="comment">% args.first_n_cev2</span>
+0097 <span class="comment">%         -- integer indicating to only output first N pairings of cev 2</span>
+0098 <span class="comment">% args.last_n_cev1</span>
+0099 <span class="comment">%         -- integer indicating to only output last N pairings of cev 1</span>
+0100 <span class="comment">% args.last_n_cev2</span>
+0101 <span class="comment">%         -- integer indicating to only output last N pairings of cev 2</span>
+0102 
+0103 <span class="comment">% Output is a CSV with each row respresenting a pair. The pairs can be</span>
+0104 <span class="comment">% many-to-many.</span>
+0105 <span class="comment">%</span>
+0106 <span class="comment">% Two additional CSV files (_cev1wo.csv and _cev2wo.csv) are generated indicating which cevents from cev1</span>
+0107 <span class="comment">% and cev2 were not paired.</span>
+0108 <span class="comment">%</span>
+0109 <span class="comment">% Only in-trial data will be considered, and cevents from one trial cannot</span>
+0110 <span class="comment">% be paired with cevents from another trial (even if the timing holds true).</span>
+0111 <span class="comment">%%</span>
+0112 
+0113 <span class="keyword">if</span> ~exist(<span class="string">'args'</span>, <span class="string">'var'</span>) || isempty(args)
+0114     args = struct();
+0115 <span class="keyword">end</span>
+0116 
+0117 <span class="keyword">if</span> ~isfield(args, <span class="string">'cevent_trials'</span>)
+0118     args.cevent_trials = [];
+0119 <span class="keyword">end</span>
+0120 
+0121 <span class="keyword">if</span> ~isfield(args, <span class="string">'first_n_cev1'</span>)
+0122     args.first_n_cev1 = [];
+0123 <span class="keyword">end</span>
+0124 
+0125 <span class="keyword">if</span> ~isfield(args, <span class="string">'last_n_cev1'</span>)
+0126     args.last_n_cev1 = [];
+0127 <span class="keyword">end</span>
+0128 
+0129 <span class="keyword">if</span> ~isfield(args, <span class="string">'first_n_cev2'</span>)
+0130     args.first_n_cev2 = [];
+0131 <span class="keyword">end</span>
+0132 
+0133 <span class="keyword">if</span> ~isfield(args, <span class="string">'last_n_cev2'</span>)
+0134     args.last_n_cev2 = [];
+0135 <span class="keyword">end</span>
+0136 
+0137 <span class="keyword">if</span> ~exist(<span class="string">'mapping'</span>, <span class="string">'var'</span>)
+0138     mapping = [];
+0139 <span class="keyword">end</span>
+0140 
+0141 <span class="keyword">if</span> ~isfield(args, <span class="string">'pairtype'</span>)
+0142     args.pairtype = ones(1, numel(mapping));
+0143 <span class="keyword">end</span>
+0144 allpairs = [];
+0145 events1_wo = [];
+0146 events2_wo = [];
+0147 
+0148 <span class="keyword">if</span> ~isempty(events1) &amp;&amp; ~isempty(events2)
+0149     events1 = sortrows(events1, [1 2 3]);
+0150     events2 = sortrows(events2, [1 2 3]);
+0151     
+0152     num_events1 = size(events1, 1);
+0153     num_events2 = size(events2, 1);
+0154     
+0155     events1 = [events1 (1:num_events1)'];
+0156     events2 = [events2 (1:num_events2)'];
+0157     
+0158     on2 = events2(:,1);
+0159     off2 = events2(:,2);
+0160     
+0161     prealloc = cell(size(events1,1),1);
+0162     <span class="keyword">for</span> c = 1:numel(prealloc)
+0163         on1 = events1(c,1);
+0164         off1 = events1(c,2);
+0165         
+0166         log = eval(timing_relation);
+0167         cev2matched = events2(log,:);
+0168         prealloc{c,1} = [repmat(events1(c,:), size(cev2matched,1), 1), cev2matched];
+0169     <span class="keyword">end</span>
+0170     
+0171     allpairs = vertcat(prealloc{:});
+0172     
+0173     <span class="keyword">if</span> ~isempty(allpairs)
+0174         <span class="comment">% on off cat idx  on  off cat idx</span>
+0175         <span class="comment">% 1   2   3   4   5   6   7   8</span>
+0176         IDX_ON1 = 1;
+0177         IDX_OFF1 = 2;
+0178         IDX_CAT1 = 3;
+0179         IDX_INS1 = 4;
+0180         IDX_ON2 = 5;
+0181         IDX_OFF2 = 6;
+0182         IDX_CAT2 = 7;
+0183         IDX_INS2 = 8;
+0184         IDX_PAIR = 9;
+0185         
+0186         <span class="comment">% only consider the pairs specified in mapping</span>
+0187         <span class="keyword">if</span> ~isempty(mapping)
+0188             <span class="keyword">if</span> ~iscell(mapping)
+0189                 mapping = num2cell(mapping, 2);
+0190             <span class="keyword">end</span>
+0191             <span class="keyword">for</span> d = 1:size(allpairs, 1)
+0192                 pair = allpairs(d,[IDX_CAT1 IDX_CAT2]);
+0193                 log = cellfun(@(a) isequal(pair, a), mapping);
+0194                 <span class="keyword">if</span> sum(log) &gt; 0
+0195                     allpairs(d, IDX_PAIR) = args.pairtype(log);
+0196                 <span class="keyword">else</span>
+0197                     allpairs(d, IDX_PAIR) = 0;
+0198                 <span class="keyword">end</span>
+0199             <span class="keyword">end</span>
+0200             allpairs(allpairs(:, IDX_PAIR) == 0,:) = [];
+0201         <span class="keyword">else</span>
+0202             <span class="comment">% fill pairtype column with 'cat0cat'</span>
+0203             cat1 = arrayfun(@num2str, allpairs(:, IDX_CAT1), <span class="string">'un'</span>, 0);
+0204             cat2 = arrayfun(@num2str, allpairs(:, IDX_CAT2), <span class="string">'un'</span>, 0);
+0205             bothcat = cellfun(@(a,b) str2double(strcat(a, <span class="string">'0'</span>, b)), cat1, cat2);
+0206             allpairs(:,11) = bothcat;
+0207         <span class="keyword">end</span>
+0208         
+0209         uidx = unique(allpairs(:, IDX_INS1));
+0210         idx_keep = [];
+0211         <span class="keyword">if</span> ~isempty(args.first_n_cev1)
+0212             <span class="keyword">for</span> u = 1:numel(uidx)
+0213                 idx_first = find(allpairs(:, IDX_INS1) == uidx(u), args.first_n_cev1, <span class="string">'first'</span>);
+0214                 idx_keep = cat(1, idx_keep, idx_first);
+0215             <span class="keyword">end</span>
+0216         <span class="keyword">end</span>
+0217         <span class="keyword">if</span> ~isempty(args.last_n_cev1)
+0218             <span class="keyword">for</span> u = 1:numel(uidx)
+0219                 idx_last = find(allpairs(:, IDX_INS1) == uidx(u), args.last_n_cev1, <span class="string">'last'</span>);
+0220                 idx_keep = cat(1, idx_keep, idx_last);
+0221             <span class="keyword">end</span>
+0222         <span class="keyword">end</span>
+0223         
+0224         idx_keep = unique(idx_keep);
+0225         
+0226         <span class="keyword">if</span> ~isempty(idx_keep)
+0227             allpairs = allpairs(idx_keep, :);
+0228         <span class="keyword">end</span>
+0229         
+0230         uidx = unique(allpairs(:, IDX_PAIR));
+0231         idx_keep = [];
+0232         <span class="keyword">if</span> ~isempty(args.first_n_cev2)
+0233             <span class="keyword">for</span> u = 1:numel(uidx)
+0234                 idx_first = find(allpairs(:, IDX_PAIR) == uidx(u), args.first_n_cev2, <span class="string">'first'</span>);
+0235                 idx_keep = cat(1, idx_keep, idx_first);
+0236             <span class="keyword">end</span>
+0237         <span class="keyword">end</span>
+0238         <span class="keyword">if</span> ~isempty(args.last_n_cev2)
+0239             <span class="keyword">for</span> u = 1:numel(uidx)
+0240                 idx_last = find(allpairs(:, IDX_PAIR) == uidx(u), args.last_n_cev2, <span class="string">'last'</span>);
+0241                 idx_keep = cat(1, idx_keep, idx_last);
+0242             <span class="keyword">end</span>
+0243         <span class="keyword">end</span>
+0244         
+0245         idx_keep = unique(idx_keep);
+0246         
+0247         <span class="keyword">if</span> ~isempty(idx_keep)
+0248             allpairs = allpairs(idx_keep, :);
+0249         <span class="keyword">end</span>
+0250         log = ~ismember(events1(:, end), allpairs(:, IDX_INS1));
+0251         events1_wo = events1(log,:);
+0252         log = ~ismember(events2(:, end), allpairs(:, IDX_INS2));
+0253         events2_wo = events2(log,:);
+0254     <span class="keyword">end</span>
+0255 <span class="keyword">end</span>
+0256 <span class="keyword">end</span>
+0257 
+0258 <a name="_sub1" href="#_subfunctions" class="code">function log = less(t1,t2,thres)</a>
+0259 less_dif = t2 - t1;
+0260 log = less_dif &gt; -0.001;
+0261 <span class="keyword">if</span> exist(<span class="string">'thres'</span>, <span class="string">'var'</span>)
+0262     log = log &amp; less_dif &lt;= thres;
+0263 <span class="keyword">end</span>
+0264 <span class="keyword">end</span>
+0265 
+0266 <a name="_sub2" href="#_subfunctions" class="code">function log = more(t1,t2,thres)</a>
+0267 more_dif = t2 - t1;
+0268 log = more_dif &gt; -0.001;
+0269 <span class="keyword">if</span> exist(<span class="string">'thres'</span>, <span class="string">'var'</span>)
+0270     log = log &amp; more_dif &gt;= thres;
+0271 <span class="keyword">end</span>
+0272 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

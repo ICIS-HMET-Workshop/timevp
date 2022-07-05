@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of demo_timevp_visualization</title>
+  <meta name="keywords" content="demo_timevp_visualization">
+  <meta name="description" content="Window for visualizing time series data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="index.html">timevp-main</a> &gt; demo_timevp_visualization.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>demo_timevp_visualization
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Window for visualizing time series data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function demo_timevp_visualization(demo_id) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Window for visualizing time series data</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function demo_timevp_visualization(demo_id)</a>
+0002 
+0003 <span class="comment">% Window for visualizing time series data</span>
+0004 
+0005 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0006 <span class="comment">% Warning: Before use, set dataset location and sample rate in</span>
+0007 <span class="comment">% timevp_config_dataset_info.m</span>
+0008 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0009 
+0010 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0011 <span class="comment">% MODULE 1: Data Visualization</span>
+0012 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0013 
+0014 addpath(<span class="string">'timevp_lib'</span>)
+0015 num_demo_subs = 3;
+0016 
+0017 <span class="comment">%% Method 1: enter a list of csv files and visualize the data</span>
+0018 <span class="keyword">if</span> demo_id == 1
+0019     csvfile_list = {<span class="string">'yulab_data\1203\cevent_eye_roi_child.csv'</span>, <span class="keyword">...</span>
+0020         <span class="string">'yulab_data\1205\cevent_eye_roi_child.csv'</span>, <span class="keyword">...</span>
+0021         <span class="string">'yulab_data\1206\cevent_eye_roi_child.csv'</span>, <span class="keyword">...</span>
+0022         <span class="string">'yulab_data\1208\cevent_eye_roi_child.csv'</span>, <span class="keyword">...</span>
+0023         };
+0024 
+0025     <span class="comment">% set parameters for generating visualization plots</span>
+0026     vis_args.annotation = {<span class="string">'1203'</span> <span class="string">'1205'</span> <span class="string">'1206'</span> <span class="string">'1208'</span>};
+0027     vis_args.windows = [30 100; 101 200; 201 300; 301 400];
+0028     vis_args.save_name = <span class="string">'timevp_output_files\vis_streams\timevp_vis_streams_example2'</span>;
+0029     
+0030     <span class="comment">% REMOVE THE X-AXIS</span>
+0031     <span class="comment">% GET 8 subjects with good data</span>
+0032     <span class="comment">% add a demo for converting between events and streams</span>
+0033     <span class="comment">% save it as a different variable</span>
+0034 
+0035     timevp_visualization(csvfile_list, vis_args);
+0036     
+0037 <span class="comment">%% Method 2: enter a list of subject or variables</span>
+0038 <span class="comment">% Plot multiple variables in one plot per subject</span>
+0039 <span class="keyword">elseif</span> demo_id == 2
+0040     subject_list = [1202 1203 1204];
+0041     subject_list = subject_list(1:num_demo_subs);
+0042     
+0043     variable_list = {<span class="string">'cevent_eye_roi_child'</span>, <span class="string">'cevent_inhand_child'</span>, <span class="keyword">...</span>
+0044         <span class="string">'cevent_eye_roi_parent'</span>, <span class="string">'cevent_inhand_parent'</span>, <span class="string">'cevent_speech_naming_local-id'</span>};
+0045 
+0046     <span class="comment">% enter a directory for storing all visualization plots</span>
+0047     vis_args.dir_plots = <span class="string">'timevp_output_files\vis_streams'</span>;
+0048     vis_args.annotation = {<span class="string">'child eye'</span>, <span class="string">'child hand'</span>, <span class="string">'parent eye'</span>, <span class="string">'parent hand'</span>, <span class="string">'parent naming'</span>};
+0049     vis_args.windows = [30 280; 280 530; 530 780];
+0050     <span class="comment">% Create visualization by subject: one plot per subject with multiple</span>
+0051     <span class="comment">% variables</span>
+0052     vis_args.is_plot_by_subject = true;
+0053 
+0054     timevp_visualization_by_subject_variable(subject_list, variable_list, vis_args)
+0055 
+0056 <span class="comment">% Plot multiple variables in one plot per subject</span>
+0057 <span class="keyword">elseif</span> demo_id == 3
+0058     <span class="comment">%subject_list = yulab_list_subjects('toyroom');</span>
+0059     subject_list = [1202 1203 1204];
+0060     subject_list = subject_list(1:num_demo_subs);
+0061     variable_list = {<span class="string">'cevent_eye_roi_child'</span>, <span class="string">'cevent_eye_roi_parent'</span>};
+0062 
+0063     <span class="comment">% enter a directory for storing all visualization plots</span>
+0064     vis_args.dir_plots = <span class="string">'timevp_output_files\vis_streams'</span>;
+0065     vis_args.is_plot_by_variable = true;
+0066 
+0067     timevp_visualization_by_subject_variable(subject_list, variable_list, vis_args)
+0068 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of align_streams</title>
+  <meta name="keywords" content="align_streams">
+  <meta name="description" content="Aligns several cont/cstream variables on time, and sticks them all together">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; align_streams.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>align_streams
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Aligns several cont/cstream variables on time, and sticks them all together</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [all_data] = align_streams(time_base, streams, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">Aligns several cont/cstream variables on time, and sticks them all together
+
+ align_streams(time_base, streams)
+ align_streams(time_base, streams, ...)
+
+ The input is a cell array of cont or cstream variables.  They are aligned
+ based on the timestamps in the first argument, which should be an Nx1
+ vector of timestamps.  The values from each variable are put together in
+ the output.
+
+
+ If there are T timestamps in the time basis, and V variables (with
+ one data column each), the output is a TxV matrix.  Each column is the
+ value from one of the variables (in the same order that you passed them
+ in).
+
+ This function should correctly handle input data with multiple columns of
+ values.
+
+ This function has to interpolate to find variable values for times
+ between the actual sample times.  The default is:  If a particular stream
+ has only integer values, use zero-order hold (step function)
+ interpolation (&quot;zoh&quot;).  Otherwise, use linear interpolation.
+
+ The default is to trust the timestamps given in the input streams.  If
+ you want to force time to be relative, that is, set each stream to start
+ at zero, use the 'ForceZero' argument:
+
+ align_streams(time_base, streams, 'ForceZero')
+
+ If the defaults for interpolation are not good enough, you can use the
+ 'InterpMethod' argument:
+
+ align_streams(time_base, streams, 'InterpMethod', 'linear')
+
+ The argument after 'InterpMethod' is either a single string or object, or a
+ cell array of them, one per stream.  Each entry is either the string
+ 'zoh', 'linear', or some other valid interpolation method.  
+
+ See also: timeseries/setinterpmethod</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="stream_cal_stats.html" class="code" title="function results = stream_cal_stats(chunks, args)">stream_cal_stats</a>	Report various stypes of statistics of stream type data</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [all_data] = align_streams(time_base, streams, varargin)</a>
+0002 <span class="comment">%Aligns several cont/cstream variables on time, and sticks them all together</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% align_streams(time_base, streams)</span>
+0005 <span class="comment">% align_streams(time_base, streams, ...)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% The input is a cell array of cont or cstream variables.  They are aligned</span>
+0008 <span class="comment">% based on the timestamps in the first argument, which should be an Nx1</span>
+0009 <span class="comment">% vector of timestamps.  The values from each variable are put together in</span>
+0010 <span class="comment">% the output.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% If there are T timestamps in the time basis, and V variables (with</span>
+0014 <span class="comment">% one data column each), the output is a TxV matrix.  Each column is the</span>
+0015 <span class="comment">% value from one of the variables (in the same order that you passed them</span>
+0016 <span class="comment">% in).</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% This function should correctly handle input data with multiple columns of</span>
+0019 <span class="comment">% values.</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% This function has to interpolate to find variable values for times</span>
+0022 <span class="comment">% between the actual sample times.  The default is:  If a particular stream</span>
+0023 <span class="comment">% has only integer values, use zero-order hold (step function)</span>
+0024 <span class="comment">% interpolation (&quot;zoh&quot;).  Otherwise, use linear interpolation.</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% The default is to trust the timestamps given in the input streams.  If</span>
+0027 <span class="comment">% you want to force time to be relative, that is, set each stream to start</span>
+0028 <span class="comment">% at zero, use the 'ForceZero' argument:</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">% align_streams(time_base, streams, 'ForceZero')</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">% If the defaults for interpolation are not good enough, you can use the</span>
+0033 <span class="comment">% 'InterpMethod' argument:</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">% align_streams(time_base, streams, 'InterpMethod', 'linear')</span>
+0036 <span class="comment">%</span>
+0037 <span class="comment">% The argument after 'InterpMethod' is either a single string or object, or a</span>
+0038 <span class="comment">% cell array of them, one per stream.  Each entry is either the string</span>
+0039 <span class="comment">% 'zoh', 'linear', or some other valid interpolation method.</span>
+0040 <span class="comment">%</span>
+0041 <span class="comment">% See also: timeseries/setinterpmethod</span>
+0042 <span class="comment">%</span>
+0043 
+0044 version = <span class="string">'$Id: align_streams.m 2000 2011-04-18 20:30:57Z thgsmith@ADS.IU.EDU $'</span>;
+0045 
+0046 all_data = [];
+0047 
+0048 <span class="comment">% If they didn't give us any data... just return nothing?</span>
+0049 <span class="keyword">if</span> isempty(streams)
+0050     <span class="keyword">return</span>
+0051 <span class="keyword">end</span>
+0052 
+0053 opt_force_zero = 0;
+0054 opt_use_default_interpolation = 1;
+0055 interp_method = [];
+0056 
+0057 I = 1;
+0058 <span class="keyword">while</span> I &lt;= length(varargin)
+0059     arg = varargin{I};
+0060     <span class="keyword">switch</span> arg
+0061         <span class="keyword">case</span> <span class="string">'ForceZero'</span>
+0062             opt_force_zero = 1;
+0063         <span class="keyword">case</span> <span class="string">'InterpMethod'</span>
+0064             <span class="keyword">if</span> I+1 &gt; length(varargin)
+0065                 error(<span class="string">'InterpMethod argument needs another argument after it'</span>);
+0066             <span class="keyword">end</span>
+0067             opt_use_default_interpolation = 0;
+0068             I = I + 1;
+0069             interp_method = varargin{I};
+0070             <span class="comment">% if they specify a *list* of interpolation methods,</span>
+0071             <span class="comment">% we should have one interpolation method for each stream.</span>
+0072             <span class="keyword">if</span> iscell(interp_method)
+0073                 <span class="keyword">if</span> length(interp_method) ~= length(streams)
+0074                     error(<span class="string">'Must specify no interpolation methods, exactly one, or one per stream'</span>);
+0075                 <span class="keyword">end</span>
+0076             <span class="keyword">end</span>
+0077         <span class="keyword">otherwise</span>
+0078             error(<span class="string">'Invalid argument: only ''ForceZero'' and ''InterpMethod'' are accepted.'</span>);
+0079     <span class="keyword">end</span>
+0080     
+0081     I = I + 1;
+0082 <span class="keyword">end</span>
+0083             
+0084             
+0085             
+0086         
+0087 
+0088 <span class="comment">% determine the size of the output</span>
+0089 num_vars = length(streams);
+0090 cols_by_var = cellfun(@(stream) size(stream, 2), streams);
+0091 num_cols = sum(cols_by_var) - num_vars;
+0092 num_times = length(time_base);
+0093 
+0094 <span class="comment">% the data (not including time) that will be returned</span>
+0095 all_data = nan(num_times, num_cols);
+0096 
+0097 
+0098 <span class="keyword">if</span> opt_force_zero
+0099     time_base(:, 1) = time_base(:, 1) - time_base(1, 1);
+0100 <span class="keyword">end</span>
+0101 
+0102 
+0103 <span class="comment">% This loop copies resampled data into the output variable</span>
+0104 
+0105 <span class="comment">%col_idx : the first column of data from the current variable</span>
+0106 col_idx = 1;
+0107 <span class="keyword">for</span> var_idx = 1:numel(streams)
+0108     var = streams{var_idx};
+0109     <span class="keyword">if</span> size(var, 1) &lt; 2
+0110         <span class="keyword">continue</span>
+0111     <span class="keyword">end</span>
+0112     num_values = size(var, 2) - 1;
+0113     
+0114     <span class="comment">% possibly adjust all streams so timestamp starts at zero</span>
+0115     <span class="keyword">if</span> opt_force_zero
+0116         var(:, 1) = var(:, 1) - var(1, 1);
+0117     <span class="keyword">end</span>
+0118     
+0119     ts = timeseries(var(:, 2:end), var(:, 1));
+0120     
+0121     
+0122     <span class="comment">% Are we guessing interpolation methods?</span>
+0123     <span class="keyword">if</span> opt_use_default_interpolation
+0124         <span class="comment">% If it looks like integers, use zero-order hold</span>
+0125         <span class="comment">% otherwise, linear.</span>
+0126         <span class="keyword">if</span> all(round(ts.Data) == ts.Data)
+0127             interpolation = <span class="string">'zoh'</span>;
+0128         <span class="keyword">else</span>
+0129             interpolation = <span class="string">'linear'</span>;
+0130         <span class="keyword">end</span>
+0131     <span class="keyword">else</span>
+0132         <span class="comment">% we're not guessing, use the explicitly-provided one.</span>
+0133         <span class="keyword">if</span> iscell(interp_method)
+0134             interpolation = interp_method{var_idx};
+0135         <span class="keyword">else</span>
+0136             interpolation = interp_method;
+0137         <span class="keyword">end</span>
+0138     <span class="keyword">end</span>
+0139     
+0140     
+0141     ts_r = resample(ts, time_base, interpolation);
+0142 <span class="comment">%     if length(time_base) ~= length(ts_r)</span>
+0143 <span class="comment">%         disp('uh oh!')</span>
+0144 <span class="comment">%         length(time_base)</span>
+0145 <span class="comment">%         length(ts_r)</span>
+0146 <span class="comment">%         ts_r</span>
+0147 <span class="comment">%         disp('huh')</span>
+0148 <span class="comment">%     end</span>
+0149 <span class="comment">%     size(all_data)</span>
+0150 <span class="comment">%     size(ts_r.Data)</span>
+0151     all_data(:, col_idx:(col_idx + num_values - 1)) = ts_r.Data;
+0152     
+0153     col_idx = col_idx + num_values;
+0154 <span class="keyword">end</span>
+0155 
+0156</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

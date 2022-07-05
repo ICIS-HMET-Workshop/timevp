@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of timevp_extract_measures</title>
+  <meta name="keywords" content="timevp_extract_measures">
+  <meta name="description" content="Function used for extracting variable measures during">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; timevp_extract_measures.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>timevp_extract_measures
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Function used for extracting variable measures during</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function timevp_extract_measures(subject_list, variable_list, segment_event, save_filename, args) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">Function used for extracting variable measures during
+ instances of a specified type of event. For example, naming
+ events while a child is looking at a specific object can be isolated</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="cell2csv.html" class="code" title="function cell2csv(filename,cellArray,delimiter)">cell2csv</a>	Writes cell array content into a *.csv file.</li><li><a href="event_cal_stats.html" class="code" title="function results = event_cal_stats(chunks, args)">event_cal_stats</a>	Report various stypes of statistics of event data</li><li><a href="get_data_by_subject.html" class="code" title="function [data, extra_info] = get_data_by_subject(subject_list, var_name, args)">get_data_by_subject</a>	This function fetches data by subject ID and variable name</li><li><a href="regroup_data.html" class="code" title="function [var_data_regroup] = regroup_data(var_data, var_category, events, event_category, groupid_matrix)">regroup_data</a>	Structure new grops of data</li><li><a href="stream_cal_stats.html" class="code" title="function results = stream_cal_stats(chunks, args)">stream_cal_stats</a>	Report various stypes of statistics of stream type data</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function timevp_extract_measures(subject_list, variable_list, segment_event, save_filename, args)</a>
+0002 <span class="comment">%Function used for extracting variable measures during</span>
+0003 <span class="comment">% instances of a specified type of event. For example, naming</span>
+0004 <span class="comment">% events while a child is looking at a specific object can be isolated</span>
+0005 
+0006 args.segment_event = segment_event;
+0007 
+0008 <span class="comment">% fetch data</span>
+0009 num_subs = length(subject_list);
+0010 num_vars = length(variable_list);
+0011 
+0012 <span class="keyword">if</span> isfield(args, <span class="string">'sample_rate'</span>)
+0013     sample_rate = args.sample_rate;
+0014 <span class="keyword">else</span>
+0015     [~, sample_rate] = timevp_config_dataset_info();
+0016 <span class="keyword">end</span>
+0017 
+0018 <span class="keyword">if</span> isfield(args, <span class="string">'groupid_matrix'</span>)
+0019     is_regroup = true;
+0020     <span class="keyword">if</span> ~isfield(args, <span class="string">'var_category'</span>) || ~isfield(args, <span class="string">'event_category'</span>)
+0021         error([<span class="string">'In order to regroup varaible by event categories, users need to specify'</span> <span class="keyword">...</span>
+0022             <span class="string">'VAR_CATEGORY and EVENT_CATEGORY.'</span>]);
+0023     <span class="keyword">end</span>
+0024 <span class="keyword">else</span>
+0025     is_regroup = false;
+0026 <span class="keyword">end</span>
+0027 
+0028 <span class="comment">% header_row1 = {'segment event:', '', };</span>
+0029 <span class="comment">% subject ID, instance ID, onset, offset, category</span>
+0030 header_row1 = cell(1, 5);
+0031 header_row1{1} = <span class="string">'segment event:'</span>;
+0032 header_row1{2} = segment_event;
+0033 header_row2 = cell(1, 5);
+0034 header_events = {<span class="string">'subject ID'</span>, <span class="string">'instance ID'</span>, <span class="string">'onset'</span>, <span class="string">'offset'</span>, <span class="string">'category value'</span>};
+0035 header_variables = {};
+0036 
+0037 results_all_measures = [];
+0038 
+0039 data_all = cell(num_subs, num_vars);
+0040 ranges_all = cell(num_subs, num_vars);
+0041 categories_var = cell(1, num_vars);
+0042 num_cols_data = nan(1, num_vars);
+0043 
+0044 <span class="keyword">for</span> vidx = 1:num_vars
+0045     var_name = variable_list{vidx};
+0046     
+0047     <span class="keyword">if</span> isfield(args, <span class="string">'var_category'</span>)
+0048         args.categories = args.var_category;
+0049     <span class="keyword">end</span>
+0050     [var_data, extra_info] = <a href="get_data_by_subject.html" class="code" title="function [data, extra_info] = get_data_by_subject(subject_list, var_name, args)">get_data_by_subject</a>(subject_list, var_name, args);
+0051     
+0052     <span class="keyword">if</span> is_regroup
+0053         var_data_regroup = cell(num_subs, 1);
+0054         groupid_list = unique(args.groupid_matrix);
+0055         <span class="keyword">for</span> sidx = 1:num_subs
+0056             var_data_regroup{sidx} = <a href="regroup_data.html" class="code" title="function [var_data_regroup] = regroup_data(var_data, var_category, events, event_category, groupid_matrix)">regroup_data</a>(var_data{sidx}, args.var_category, <span class="keyword">...</span>
+0057                 extra_info.ranges{sidx}, args.event_category, args.groupid_matrix);
+0058         <span class="keyword">end</span>
+0059         data_all(:, vidx) = var_data_regroup;
+0060         ranges_all(:, vidx) = extra_info.ranges;
+0061         categories_var{1, vidx} = groupid_list;
+0062         num_cols_data(1, vidx) = extra_info.num_cols_data;
+0063     <span class="keyword">else</span>
+0064         data_all(:, vidx) = var_data;
+0065         ranges_all(:, vidx) = extra_info.ranges;
+0066         categories_var{1, vidx} = extra_info.categories;
+0067         num_cols_data(1, vidx) = extra_info.num_cols_data;
+0068     <span class="keyword">end</span>
+0069 <span class="keyword">end</span>
+0070 
+0071 args.sample_rate = sample_rate;
+0072 
+0073 <span class="keyword">for</span> sidx = 1:num_subs
+0074     sub_id = subject_list(sidx);
+0075     ranges_sub = ranges_all{sidx, 1};
+0076     num_events = size(ranges_sub, 1);
+0077     results_event = [repmat(sub_id, num_events, 1) (1:num_events)' ranges_sub];
+0078     
+0079     <span class="keyword">if</span> isempty(ranges_sub)
+0080         <span class="keyword">continue</span>
+0081     <span class="keyword">end</span>
+0082     results_variables = [];
+0083     
+0084     <span class="keyword">for</span> vidx = 1:num_vars
+0085         var_name = variable_list{vidx};
+0086         var_sub = data_all{sidx, vidx};
+0087         args.categories = categories_var{1, vidx};
+0088         args.individual_ranges = ranges_sub;
+0089         
+0090         num_categories = length(args.categories);
+0091 
+0092         <span class="keyword">if</span> num_cols_data(1, vidx) == 2
+0093             <span class="keyword">if</span> isempty(var_sub)
+0094                 results_variables = [results_variables nan(num_events, num_categories)];
+0095             <span class="keyword">else</span>
+0096                 results_one = <a href="stream_cal_stats.html" class="code" title="function results = stream_cal_stats(chunks, args)">stream_cal_stats</a>(var_sub, args);
+0097                 results_variables = [results_variables results_one.individual_prop_by_cat];
+0098             <span class="keyword">end</span>
+0099 
+0100             <span class="comment">% Construct csv header information, only needed once</span>
+0101             <span class="keyword">if</span> sidx == 1
+0102                 <span class="keyword">if</span> is_regroup &amp;&amp; isfield(args, <span class="string">'group_label'</span>)
+0103                     header_one = args.group_label;
+0104                 <span class="keyword">else</span>
+0105                     header_one = arrayfun(@(x) [<span class="string">'cat-'</span> num2str(x)], <span class="keyword">...</span>
+0106                         results_one.categories, <span class="string">'UniformOutput'</span>, false);
+0107                 <span class="keyword">end</span>
+0108                 header_row2 = [header_row2 {<span class="string">'proportion_by_category'</span>} cell(1, num_categories-1)];
+0109             <span class="keyword">end</span>
+0110         <span class="keyword">elseif</span> num_cols_data(1, vidx) == 3
+0111             <span class="keyword">if</span> isempty(var_sub)
+0112                 results_variables = [results_variables nan(num_events, num_categories*3)];
+0113             <span class="keyword">else</span>
+0114                 results_one = <a href="event_cal_stats.html" class="code" title="function results = event_cal_stats(chunks, args)">event_cal_stats</a>(var_sub, args);
+0115                 results_variables = [results_variables results_one.individual_prop_by_cat <span class="keyword">...</span>
+0116                     results_one.individual_mean_dur_by_cat, results_one.individual_number_by_cat];
+0117             <span class="keyword">end</span>
+0118 
+0119             <span class="comment">% Construct csv header information, only needed once</span>
+0120             <span class="keyword">if</span> sidx == 1
+0121                 <span class="keyword">if</span> is_regroup &amp;&amp; isfield(args, <span class="string">'group_label'</span>)
+0122                     header_one = args.group_label;
+0123                 <span class="keyword">else</span>
+0124                     header_one = arrayfun(@(x) [<span class="string">'cat-'</span> num2str(x)], <span class="keyword">...</span>
+0125                         results_one.categories, <span class="string">'UniformOutput'</span>, false);
+0126                 <span class="keyword">end</span>
+0127                 header_one = repmat(header_one, 1, 3);
+0128                 header_row2 = [header_row2 {<span class="string">'proportion_by_category'</span>} cell(1, num_categories-1)<span class="keyword">...</span>
+0129                     {<span class="string">'mean_duration_by_category'</span>} cell(1, num_categories-1) <span class="keyword">...</span>
+0130                     {<span class="string">'number_of_events_by_category'</span>} cell(1, num_categories-1)];
+0131             <span class="keyword">end</span>
+0132         <span class="keyword">else</span>
+0133             error(<span class="string">'Invalid data type with %d columns.'</span>, num_cols_data(1, vidx));
+0134         <span class="keyword">end</span>
+0135 
+0136         <span class="keyword">if</span> sidx == 1
+0137             header_variables = [header_variables header_one];
+0138             header_row1 = [header_row1 {var_name} cell(1, length(header_one)-1)];
+0139         <span class="keyword">end</span>
+0140     <span class="keyword">end</span>
+0141     
+0142     results_all_measures = [results_all_measures; [results_event results_variables]];
+0143 <span class="keyword">end</span> <span class="comment">% end of sidx</span>
+0144 
+0145 header_info = [header_row1; header_row2; cell(1, length(header_row1)); <span class="keyword">...</span>
+0146     [header_events header_variables]];
+0147 csv_measures = num2cell(results_all_measures);
+0148 
+0149 <a href="cell2csv.html" class="code" title="function cell2csv(filename,cellArray,delimiter)">cell2csv</a>(save_filename, [header_info; csv_measures]);
+0150 fprintf(<span class="string">'Result file saved to: %s\n'</span>, save_filename);</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

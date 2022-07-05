@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of demo_timevp_extract_measures</title>
+  <meta name="keywords" content="demo_timevp_extract_measures">
+  <meta name="description" content="Extract variable measures based on one type of events">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="index.html">timevp-main</a> &gt; demo_timevp_extract_measures.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>demo_timevp_extract_measures
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Extract variable measures based on one type of events</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function demo_timevp_extract_measures(demo_id) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Extract variable measures based on one type of events</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function demo_timevp_extract_measures(demo_id)</a>
+0002 <span class="comment">% Extract variable measures based on one type of events</span>
+0003 clearvars;
+0004 addpath(<span class="string">'timevp_lib'</span>)
+0005 num_demo_subs = 3;
+0006 
+0007 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0008 <span class="comment">% MODULE 3: Extract variable measures based on one type of events</span>
+0009 <span class="comment">% E.g. where the infant or the parent was looking at when the parent was</span>
+0010 <span class="comment">% displaying the toy</span>
+0011 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0012 
+0013 <span class="keyword">if</span> demo_id == 1
+0014     <span class="comment">% Get subject list</span>
+0015     subject_list = [1202 1203 1204];
+0016     subject_list = subject_list(1:num_demo_subs);
+0017     
+0018     variable_list = {<span class="string">'cevent_eye_roi_child'</span>, <span class="string">'cevent_eye_roi_parent'</span>};
+0019     save_filename = <span class="string">'timevp_output_files\example_extract_measures.csv'</span>;
+0020 
+0021     segment_event = <span class="string">'cevent_speech_naming_local-id'</span>;
+0022     timevp_extract_measures(subject_list, variable_list, segment_event, save_filename);
+0023     
+0024 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0025 <span class="comment">% By enabling input parameters of WHENCE and INTERVAL, one can extract</span>
+0026 <span class="comment">% measures before, during or after a certain event.</span>
+0027 <span class="comment">% E.g. where the infant or the parent was looking at from 5 seconds before</span>
+0028 <span class="comment">% to the onset of parent naming an object</span>
+0029 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0030 <span class="keyword">elseif</span> demo_id == 2
+0031     subject_list = [1202 1203 1204];
+0032     subject_list = subject_list(1:num_demo_subs);
+0033     variable_list = {<span class="string">'cevent_eye_roi_child'</span>, <span class="string">'cevent_eye_roi_parent'</span>};
+0034     segment_event = <span class="string">'cevent_speech_naming_local-id'</span>;
+0035     
+0036     stats_args.whence = <span class="string">'start'</span>;
+0037     stats_args.interval = [-5 0];
+0038     save_filename = <span class="string">'timevp_output_files\example_extract_measures_whence.csv'</span>;
+0039 
+0040     timevp_extract_measures(subject_list, variable_list, segment_event, save_filename, stats_args);
+0041     
+0042 <span class="keyword">elseif</span> demo_id == 3
+0043     
+0044     subject_list = [1202 1203 1204];
+0045     subject_list = subject_list(1:num_demo_subs);
+0046     
+0047     num_categories = 25;
+0048     variable_list = {<span class="string">'cevent_eye_roi_child'</span>, <span class="string">'cevent_eye_roi_parent'</span>};
+0049     segment_event = <span class="string">'cevent_speech_naming_local-id'</span>;
+0050     args.event_category = 1:num_categories;
+0051     args.var_category = 1:num_categories;
+0052     
+0053     args.groupid_matrix = ones(num_categories, num_categories) * 2;
+0054     <span class="keyword">for</span> i = 1:num_categories
+0055         args.groupid_matrix(i,i) = 1;
+0056     <span class="keyword">end</span>
+0057     args.group_label = {<span class="string">'target'</span>, <span class="string">'distractor'</span>};
+0058 <span class="comment">%     args.convert_event2stream = true;</span>
+0059     save_filename = <span class="string">'timevp_output_files\example_extract_measures_regroup_target_distractor.csv'</span>;
+0060     
+0061     timevp_extract_measures(subject_list, variable_list, segment_event, save_filename, args);
+0062     
+0063 <span class="keyword">elseif</span> demo_id == 4
+0064     subject_list = [7002 7003 7005 7006];
+0065     num_categories = 3;
+0066     variable_list = {<span class="string">'cevent_eye_roi_child'</span>, <span class="string">'cevent_eye_roi_parent'</span>};
+0067     segment_event = <span class="string">'cevent_speech_naming_local-id'</span>;
+0068 
+0069     args.event_category = 1:num_categories;
+0070     args.var_category = 1:num_categories;
+0071     args.groupid_matrix = [1 2 2;
+0072                            2 1 2;
+0073                            2 2 1];
+0074 
+0075     args.group_label = {<span class="string">'target'</span>, <span class="string">'distractor'</span>};
+0076     save_filename = <span class="string">'timevp_output_files\example_extract_measures_regroup_target_distractor.csv'</span>;
+0077 
+0078     timevp_extract_measures(subject_list, variable_list, segment_event, save_filename, args);
+0079 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

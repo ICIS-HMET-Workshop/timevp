@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of has_variable</title>
+  <meta name="keywords" content="has_variable">
+  <meta name="description" content="Returns true if the variable file exists in that subj's dir.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; has_variable.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>has_variable
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Returns true if the variable file exists in that subj's dir.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function has_it = has_variable(subject_id, var_name) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">Returns true if the variable file exists in that subj's dir.
+   has_variable(SUBJECT_ID, VARIABLE_NAME)
+
+   Searches the data/subject_id subdirectory of the subject data associated with
+   the given numerical subject ID, and sees if a csv or mat file containing
+   the given variable exists.  If so, returns 1, if not, returns 0.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="get_variable_file_path.html" class="code" title="function variable_file = get_variable_file_path(sub_id, var_name)">get_variable_file_path</a>	Returns the complete file path based on a subject and</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="get_variable_data.html" class="code" title="function data = get_variable_data(subject_id, variable_name)">get_variable_data</a>	Return subject_id and variable_name of variable</li><li><a href="save_variable_data.html" class="code" title="function data_filepath = save_variable_data(subject_id, variable_name, data)">save_variable_data</a>	Saves data to specified location with: data_filepath = '';</li><li><a href="timevp_construct_temporal_profile.html" class="code" title="function [profile_data] = timevp_construct_temporal_profile(input)">timevp_construct_temporal_profile</a>	Generates temporal profile of a group of continue variables</li><li><a href="timevp_extract_pairs_by_subject.html" class="code" title="function [allpairs, events1_wo, events2_wo] = timevp_extract_pairs_by_subject(subject_list, variable1, variable2, timing_relation, dir_savefiles, mapping, args)">timevp_extract_pairs_by_subject</a>	Extracts pairs of events for a specific subject that fit a specified temporal condition</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function has_it = has_variable(subject_id, var_name)</a>
+0002 <span class="comment">%Returns true if the variable file exists in that subj's dir.</span>
+0003 <span class="comment">%   has_variable(SUBJECT_ID, VARIABLE_NAME)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%   Searches the data/subject_id subdirectory of the subject data associated with</span>
+0006 <span class="comment">%   the given numerical subject ID, and sees if a csv or mat file containing</span>
+0007 <span class="comment">%   the given variable exists.  If so, returns 1, if not, returns 0.</span>
+0008 
+0009 variable_file = <a href="get_variable_file_path.html" class="code" title="function variable_file = get_variable_file_path(sub_id, var_name)">get_variable_file_path</a>(subject_id, var_name);
+0010 has_it = exist(variable_file, <span class="string">'file'</span>) == 2;
+0011 
+0012 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of stream2event</title>
+  <meta name="keywords" content="stream2event">
+  <meta name="description" content="Convert stream data to cevent data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; stream2event.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>stream2event
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Convert stream data to cevent data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function result = stream2event(stream, sample_rate, include_zero) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Convert stream data to cevent data
+ 
+ cevent = cstream2cevent(stream, include_zero)
+
+ stream - (input)category stream. list of pair [timestamp categorynumber]
+               e.g.
+               344.7000   32.0000
+               344.8000   34.0000
+               344.9000   34.0000
+               345.0000   34.0000
+               345.1000   34.0000
+               345.2000   34.0000
+               345.3000   34.0000
+               345.4000   32.0000
+               345.5000   32.0000
+               345.6000   32.0000
+ include_zero: a flag determing whether 0 segments should be treated as events
+ or not. include_zero == 0 means not including 0 events, which is the
+ default.
+
+ cevent: (output)category event. list of [start_time end_time categorynumber]
+        344.7000   344.8000  32.0000
+        344.8000   345.4000  34.0000
+        345.4000   345.7000  32.0000
+
+  This function is copied from Ikhyun's function
+  make_cevent_from_cstream.   Feb 19,2009
+  
+  Last modified by txu@indiana.edu</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="get_data_by_subject.html" class="code" title="function [data, extra_info] = get_data_by_subject(subject_list, var_name, args)">get_data_by_subject</a>	This function fetches data by subject ID and variable name</li><li><a href="stream_cal_stats.html" class="code" title="function results = stream_cal_stats(chunks, args)">stream_cal_stats</a>	Report various stypes of statistics of stream type data</li><li><a href="timevp_compute_statistics.html" class="code" title="function result_stats = timevp_compute_statistics(variable_name, subject_list, args)">timevp_compute_statistics</a>	Computes event distribution statistics of provided time series data</li><li><a href="timevp_construct_temporal_profile.html" class="code" title="function [profile_data] = timevp_construct_temporal_profile(input)">timevp_construct_temporal_profile</a>	Generates temporal profile of a group of continue variables</li><li><a href="timevp_extract_pairs.html" class="code" title="function [allpairs, events1_wo, events2_wo] = timevp_extract_pairs(filename1, filename2, timing_relation, savefilename, mapping, args)">timevp_extract_pairs</a>	Extracts pairs of events that fit a specified temporal condition</li><li><a href="visualize_streams.html" class="code" title="function visualize_streams(data, args, cont_data, cont_args)">visualize_streams</a>	Plotting function for visualizing temporal pattens</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function result = stream2event(stream, sample_rate, include_zero)</a>
+0002 <span class="comment">% Convert stream data to cevent data</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% cevent = cstream2cevent(stream, include_zero)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% stream - (input)category stream. list of pair [timestamp categorynumber]</span>
+0007 <span class="comment">%               e.g.</span>
+0008 <span class="comment">%               344.7000   32.0000</span>
+0009 <span class="comment">%               344.8000   34.0000</span>
+0010 <span class="comment">%               344.9000   34.0000</span>
+0011 <span class="comment">%               345.0000   34.0000</span>
+0012 <span class="comment">%               345.1000   34.0000</span>
+0013 <span class="comment">%               345.2000   34.0000</span>
+0014 <span class="comment">%               345.3000   34.0000</span>
+0015 <span class="comment">%               345.4000   32.0000</span>
+0016 <span class="comment">%               345.5000   32.0000</span>
+0017 <span class="comment">%               345.6000   32.0000</span>
+0018 <span class="comment">% include_zero: a flag determing whether 0 segments should be treated as events</span>
+0019 <span class="comment">% or not. include_zero == 0 means not including 0 events, which is the</span>
+0020 <span class="comment">% default.</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% cevent: (output)category event. list of [start_time end_time categorynumber]</span>
+0023 <span class="comment">%        344.7000   344.8000  32.0000</span>
+0024 <span class="comment">%        344.8000   345.4000  34.0000</span>
+0025 <span class="comment">%        345.4000   345.7000  32.0000</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%  This function is copied from Ikhyun's function</span>
+0028 <span class="comment">%  make_cevent_from_cstream.   Feb 19,2009</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%  Last modified by txu@indiana.edu</span>
+0031 
+0032 <span class="keyword">if</span> isempty(stream)
+0033     warning(<span class="string">'Input events is empty. Return empty stream.'</span>);
+0034     result = zeros(0, 3);
+0035     <span class="keyword">return</span>;
+0036 <span class="keyword">end</span>
+0037 
+0038 <span class="keyword">if</span> size(stream, 2) ~= 2
+0039     error(<span class="string">'Input stream must be in this type of data structure: [timestamp category]'</span>);
+0040 <span class="keyword">end</span>
+0041 
+0042 <span class="keyword">if</span> nargin &lt; 2
+0043     sample_rate = timevp_config_dataset_info();
+0044 <span class="keyword">end</span>
+0045 
+0046 len_stream = size(stream, 1);
+0047 result = nan(len_stream, 3);
+0048 
+0049 <span class="keyword">if</span> isempty(stream)
+0050     warning(<span class="string">'The input data stream is empty. Exit funciton.'</span>);
+0051     <span class="keyword">return</span>
+0052 <span class="keyword">end</span>
+0053 
+0054 <span class="keyword">if</span> ~exist(<span class="string">'include_zero'</span>, <span class="string">'var'</span>)
+0055     include_zero = false;
+0056 <span class="keyword">end</span>
+0057 
+0058 MULTIPLIER = 1.2;
+0059 
+0060 gap = 0;
+0061 result(1, 1) = stream(1, 1);   <span class="comment">% start timestamp</span>
+0062 result(1, 3) = stream(1, 2);   <span class="comment">% value</span>
+0063 <span class="comment">% end_time = result(1,1) + gap; % temporal end timestamp</span>
+0064 idx = 1;
+0065 <span class="keyword">for</span> i = 2:len_stream
+0066     gap = stream(i,1) - stream(i-1,1);
+0067     <span class="keyword">if</span> gap &gt; (sample_rate*MULTIPLIER) || stream(i,2) ~= stream(i-1,2)
+0068         idx = idx + 1;
+0069         result(idx-1,2) = stream(i-1,1) + sample_rate;
+0070         result(idx,1) = stream(i,1);
+0071         result(idx,3) = stream(i,2);
+0072     <span class="keyword">end</span>
+0073 <span class="keyword">end</span>
+0074 result(idx,2) = max(result(idx,1) + gap, stream(<span class="keyword">end</span>, 1) + gap);
+0075 result = result(1:idx,:);
+0076 
+0077 <span class="keyword">if</span> include_zero == 0 <span class="comment">% not including 0 events</span>
+0078     nonzeros = result(:, 3) ~= 0;
+0079     result = result(nonzeros, :);
+0080 <span class="keyword">end</span>
+0081 
+0082 <span class="comment">% exclude NaN data</span>
+0083 result = result(~isnan(result(:, 3)), :);
+0084</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

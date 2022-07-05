@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of cstream2cevent</title>
+  <meta name="keywords" content="cstream2cevent">
+  <meta name="description" content="Convert cstream data to cevent data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; cstream2cevent.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>cstream2cevent
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Convert cstream data to cevent data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [res, sample_rate] = cstream2cevent(cstream, sample_rate, include_zero) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Convert cstream data to cevent data
+ 
+ cevent = cstream2cevent(cstream, include_zero)
+
+ cstream - (input)category cstream. list of pair [timestamp categorynumber]
+               e.g.
+               344.7000   32.0000
+               344.8000   34.0000
+               344.9000   34.0000
+               345.0000   34.0000
+               345.1000   34.0000
+               345.2000   34.0000
+               345.3000   34.0000
+               345.4000   32.0000
+               345.5000   32.0000
+               345.6000   32.0000
+ include_zero: a flag determing whether 0 segments should be treated as events
+ or not. include_zero == 0 means not including 0 events, which is the
+ default.
+
+ cevent: (output)category event. list of [start_time end_time categorynumber]
+        344.7000   344.8000  32.0000
+        344.8000   345.4000  34.0000
+        345.4000   345.7000  32.0000
+
+  This function is copied from Ikhyun's function
+  make_cevent_from_cstream.   Feb 19,2009
+  
+  Last modified by txu@indiana.edu, Jun. 19, 2014</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [res, sample_rate] = cstream2cevent(cstream, sample_rate, include_zero)</a>
+0002 <span class="comment">% Convert cstream data to cevent data</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% cevent = cstream2cevent(cstream, include_zero)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% cstream - (input)category cstream. list of pair [timestamp categorynumber]</span>
+0007 <span class="comment">%               e.g.</span>
+0008 <span class="comment">%               344.7000   32.0000</span>
+0009 <span class="comment">%               344.8000   34.0000</span>
+0010 <span class="comment">%               344.9000   34.0000</span>
+0011 <span class="comment">%               345.0000   34.0000</span>
+0012 <span class="comment">%               345.1000   34.0000</span>
+0013 <span class="comment">%               345.2000   34.0000</span>
+0014 <span class="comment">%               345.3000   34.0000</span>
+0015 <span class="comment">%               345.4000   32.0000</span>
+0016 <span class="comment">%               345.5000   32.0000</span>
+0017 <span class="comment">%               345.6000   32.0000</span>
+0018 <span class="comment">% include_zero: a flag determing whether 0 segments should be treated as events</span>
+0019 <span class="comment">% or not. include_zero == 0 means not including 0 events, which is the</span>
+0020 <span class="comment">% default.</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% cevent: (output)category event. list of [start_time end_time categorynumber]</span>
+0023 <span class="comment">%        344.7000   344.8000  32.0000</span>
+0024 <span class="comment">%        344.8000   345.4000  34.0000</span>
+0025 <span class="comment">%        345.4000   345.7000  32.0000</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%  This function is copied from Ikhyun's function</span>
+0028 <span class="comment">%  make_cevent_from_cstream.   Feb 19,2009</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%  Last modified by txu@indiana.edu, Jun. 19, 2014</span>
+0031 
+0032 MAX_SAMPLE_RATE = 0.1001;
+0033 
+0034 num = size(cstream,1);
+0035 res = zeros(num,3);
+0036 
+0037 <span class="keyword">if</span> (isempty(cstream))
+0038     <span class="keyword">return</span>
+0039 <span class="keyword">end</span>
+0040 
+0041 <span class="keyword">if</span> ~exist(<span class="string">'sample_rate'</span>, <span class="string">'var'</span>)
+0042     warning(<span class="string">'Sample_rate is a neccesary input for this function'</span>);
+0043 <span class="comment">%     chunk_len = size(cstream, 1);</span>
+0044     sr_list = cstream(2:<span class="keyword">end</span>,1) - cstream(1:end-1,1);
+0045     sample_rate = mode(sr_list);
+0046     <span class="keyword">if</span> sample_rate &gt; MAX_SAMPLE_RATE
+0047         error([<span class="string">'Our estimate sample rate is larger than 0.1, which is '</span> <span class="keyword">...</span>
+0048             <span class="string">'the largerest sample rate in multisensory project, please enter sample rate manually'</span>]);
+0049     <span class="keyword">end</span>
+0050 <span class="keyword">end</span>
+0051 
+0052 <span class="keyword">if</span> ~exist(<span class="string">'include_zero'</span>, <span class="string">'var'</span>)
+0053     include_zero = 0;
+0054 <span class="keyword">end</span>
+0055 
+0056 max_gap = sample_rate * 1.5;
+0057 
+0058 gap = 0;
+0059 res(1,1) = cstream(1,1);   <span class="comment">% start timestamp</span>
+0060 res(1,3) = cstream(1,2);   <span class="comment">% value</span>
+0061 <span class="comment">% end_time = res(1,1) + gap; % temporal end timestamp</span>
+0062 idx = 1;
+0063 <span class="keyword">for</span> i = 2:num
+0064     gap = cstream(i,1) - cstream(i-1,1);
+0065     <span class="keyword">if</span> gap &gt; max_gap || cstream(i,2) ~= cstream(i-1,2)
+0066         idx = idx + 1;
+0067         res(idx-1,2) = cstream(i-1,1) + sample_rate;
+0068         res(idx,1) = cstream(i,1);
+0069         res(idx,3) = cstream(i,2);
+0070     <span class="keyword">end</span>
+0071 <span class="keyword">end</span>
+0072 res(idx,2) = max(res(idx,1) + gap, cstream(<span class="keyword">end</span>, 1) + gap);
+0073 res = res(1:idx,:);
+0074 
+0075 <span class="keyword">if</span> (include_zero == 0) <span class="comment">% not including 0 events</span>
+0076     nonzeros = res(:, 3) ~= 0;
+0077     res = res(nonzeros, :);
+0078 <span class="keyword">end</span>
+0079 
+0080</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

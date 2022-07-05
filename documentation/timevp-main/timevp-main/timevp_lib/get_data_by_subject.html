@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of get_data_by_subject</title>
+  <meta name="keywords" content="get_data_by_subject">
+  <meta name="description" content="This function fetches data by subject ID and variable name">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; get_data_by_subject.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>get_data_by_subject
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>This function fetches data by subject ID and variable name</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [data, extra_info] = get_data_by_subject(subject_list, var_name, args) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> This function fetches data by subject ID and variable name</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="event2stream.html" class="code" title="function stream = event2stream(events, sample_rate, default_value, start_time, end_time)">event2stream</a>	Generate stream from events</li><li><a href="event_category_equals.html" class="code" title="function out = event_category_equals(events, categories)">event_category_equals</a>	Makes a cevent variable with only some of the instances in the input cevent</li><li><a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>	Extract chunks from data, delegating based on data type</li><li><a href="get_variable_data.html" class="code" title="function data = get_variable_data(subject_id, variable_name)">get_variable_data</a>	Return subject_id and variable_name of variable</li><li><a href="stream2event.html" class="code" title="function result = stream2event(stream, sample_rate, include_zero)">stream2event</a>	Convert stream data to cevent data</li><li><a href="stream_category_equals.html" class="code" title="function out = stream_category_equals(streams, categories)">stream_category_equals</a>	Makes a cevent variable with only some of the instances in the input cevent</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="get_segments.html" class="code" title="function [data_segments_list, data_events_list] = get_segments(subject_list, var_name, segment_event, event_values, is_value_matching)">get_segments</a>	Get list of data segments with specified variable conditions</li><li><a href="timevp_compute_statistics.html" class="code" title="function result_stats = timevp_compute_statistics(variable_name, subject_list, args)">timevp_compute_statistics</a>	Computes event distribution statistics of provided time series data</li><li><a href="timevp_construct_temporal_profile.html" class="code" title="function [profile_data] = timevp_construct_temporal_profile(input)">timevp_construct_temporal_profile</a>	Generates temporal profile of a group of continue variables</li><li><a href="timevp_extract_measures.html" class="code" title="function timevp_extract_measures(subject_list, variable_list, segment_event, save_filename, args)">timevp_extract_measures</a>	Function used for extracting variable measures during</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [data, extra_info] = get_data_by_subject(subject_list, var_name, args)</a>
+0002 <span class="comment">% This function fetches data by subject ID and variable name</span>
+0003 
+0004 <span class="keyword">if</span> nargin &lt; 3
+0005     args = struct([]);
+0006 <span class="keyword">end</span>
+0007 
+0008 <span class="keyword">if</span> isfield(args, <span class="string">'sample_rate'</span>)
+0009     sample_rate = args.sample_rate;
+0010 <span class="keyword">else</span>
+0011     [~, sample_rate] = timevp_config_dataset_info();
+0012 <span class="keyword">end</span>
+0013 
+0014 num_subs = length(subject_list);
+0015 num_cols_data = nan(num_subs, 1);
+0016 chunks = cell(num_subs, 1);
+0017 data = [];
+0018 <span class="keyword">if</span> ~isfield(args, <span class="string">'categories'</span>)
+0019     categories = [];
+0020 <span class="keyword">end</span>
+0021 <span class="keyword">if</span> isfield(args, <span class="string">'segment_event'</span>)
+0022     ranges = cell(num_subs, 1);
+0023 <span class="keyword">end</span>
+0024 
+0025 <span class="keyword">for</span> sidx = 1:num_subs
+0026     sub_id = subject_list(sidx);
+0027     data_one = <a href="get_variable_data.html" class="code" title="function data = get_variable_data(subject_id, variable_name)">get_variable_data</a>(sub_id, var_name);
+0028     
+0029     <span class="keyword">if</span> isempty(data_one)
+0030         <span class="keyword">continue</span>
+0031     <span class="keyword">end</span>
+0032 
+0033     size_one = size(data_one, 2);
+0034     
+0035     <span class="keyword">if</span> size_one ~= 2 &amp;&amp; size_one ~= 3
+0036         error([<span class="string">'This function only accept stream [timestamp value] or '</span><span class="keyword">...</span>
+0037             <span class="string">'event [onset offset value] as input.'</span>]);
+0038     <span class="keyword">end</span>
+0039 
+0040     <span class="keyword">if</span> size_one == 3 &amp;&amp; isfield(args, <span class="string">'convert_event2stream'</span>) &amp;&amp; args.convert_event2stream
+0041         data_one = <a href="event2stream.html" class="code" title="function stream = event2stream(events, sample_rate, default_value, start_time, end_time)">event2stream</a>(data_one, sample_rate);
+0042         size_one = size(data_one, 2);
+0043     <span class="keyword">end</span>
+0044     
+0045     num_cols_data(sidx) = size_one;
+0046     
+0047     <span class="keyword">if</span> isfield(args, <span class="string">'categories'</span>)
+0048         data_one = <a href="stream_category_equals.html" class="code" title="function out = stream_category_equals(streams, categories)">stream_category_equals</a>(data_one, args.categories);
+0049     <span class="keyword">else</span>
+0050         categories = [categories; data_one(:,end)];
+0051     <span class="keyword">end</span>
+0052     
+0053     <span class="keyword">if</span> isfield(args, <span class="string">'segment_event'</span>)
+0054         events_one = <a href="get_variable_data.html" class="code" title="function data = get_variable_data(subject_id, variable_name)">get_variable_data</a>(sub_id, args.segment_event);
+0055         <span class="keyword">if</span> size(events_one, 2) == 2
+0056             events_one = <a href="stream2event.html" class="code" title="function result = stream2event(stream, sample_rate, include_zero)">stream2event</a>(events_one, sample_rate);
+0057         <span class="keyword">end</span>
+0058         
+0059         <span class="keyword">if</span> isfield(args, <span class="string">'event_values'</span>)
+0060             events_one = <a href="event_category_equals.html" class="code" title="function out = event_category_equals(events, categories)">event_category_equals</a>(events_one, args.event_values);
+0061         <span class="keyword">end</span>
+0062         
+0063         <span class="keyword">if</span> isempty(events_one)
+0064             <span class="keyword">continue</span>
+0065         <span class="keyword">end</span>
+0066         
+0067         [extracted_data, extracted_info] = <a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>(data_one, events_one, args);
+0068         chunks{sidx} = extracted_data;
+0069         ranges{sidx} = extracted_info.ranges;
+0070     <span class="keyword">elseif</span> isfield(args, <span class="string">'ranges'</span>)
+0071         ranges = args.ranges;
+0072         <span class="keyword">if</span> ~iscell(ranges)
+0073             ranges = repmat({ranges}, num_subs, 1);
+0074         <span class="keyword">end</span>
+0075         <span class="keyword">if</span> length(ranges) ~= num_subs
+0076             error(<span class="string">'The number of ranges needs to be the same as the number of subjects. Function exit.'</span>)
+0077         <span class="keyword">end</span>
+0078         range_one = ranges{sidx};
+0079         [extracted_data, extracted_info] = <a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>(data_one, range_one, args);
+0080         <span class="keyword">if</span> size(range_one, 1) == 1
+0081             chunks{sidx} = extracted_data{1};
+0082         <span class="keyword">else</span>
+0083             chunks{sidx} = extracted_data;
+0084         <span class="keyword">end</span>
+0085         ranges{sidx} = extracted_info.ranges;
+0086     <span class="keyword">else</span>
+0087         chunks{sidx} = data_one;
+0088     <span class="keyword">end</span>
+0089     
+0090 <span class="keyword">end</span>
+0091 
+0092 <span class="keyword">if</span> num_subs &gt; 1
+0093     num_cols_data = unique(num_cols_data(num_cols_data &gt; 0));
+0094     data = chunks;
+0095 <span class="keyword">else</span>
+0096     data = chunks{1};
+0097 <span class="keyword">end</span>
+0098 
+0099 <span class="keyword">if</span> ~isfield(args, <span class="string">'categories'</span>)
+0100     categories = unique(categories(~isnan(categories)));
+0101 <span class="keyword">end</span>
+0102 
+0103 extra_info.num_cols_data = num_cols_data;
+0104 <span class="keyword">if</span> isfield(args, <span class="string">'categories'</span>)
+0105     extra_info.categories = args.categories;
+0106 <span class="keyword">else</span>
+0107     extra_info.categories = categories';
+0108 <span class="keyword">end</span>
+0109 
+0110 <span class="keyword">if</span> isfield(args, <span class="string">'segment_event'</span>) || isfield(args, <span class="string">'ranges'</span>)
+0111     extra_info.ranges = ranges;
+0112     <span class="keyword">if</span> num_subs == 1
+0113         extra_info.ranges = ranges{1};
+0114     <span class="keyword">end</span>
+0115 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of event_relative_intervals</title>
+  <meta name="keywords" content="event_relative_intervals">
+  <meta name="description" content="Find time relative to start or end of events">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; event_relative_intervals.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>event_relative_intervals
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Find time relative to start or end of events</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function relative_intervals = event_relative_intervals(event, whence, interval) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Find time relative to start or end of events
+ This function just calls cevent_relative_intervals.m
+ 
+ USAGE:
+ event_relative_intervals(event, 'start', [-5 0])
+   Make a new event.  For each instance of the original event, make a new
+   instance that's the 5 seconds before the event starts, up to the moment
+   the event starts.
+
+ See also: <a href="cevent_relative_intervals.html" class="code" title="function relative_intervals = cevent_relative_intervals(cevent, whence, interval)">CEVENT_RELATIVE_INTERVALS</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="cevent_relative_intervals.html" class="code" title="function relative_intervals = cevent_relative_intervals(cevent, whence, interval)">cevent_relative_intervals</a>	Finds time relative to start or end of event</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="timevp_construct_temporal_profile.html" class="code" title="function [profile_data] = timevp_construct_temporal_profile(input)">timevp_construct_temporal_profile</a>	Generates temporal profile of a group of continue variables</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function relative_intervals = event_relative_intervals(event, whence, interval)</a>
+0002 <span class="comment">% Find time relative to start or end of events</span>
+0003 <span class="comment">% This function just calls cevent_relative_intervals.m</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% USAGE:</span>
+0006 <span class="comment">% event_relative_intervals(event, 'start', [-5 0])</span>
+0007 <span class="comment">%   Make a new event.  For each instance of the original event, make a new</span>
+0008 <span class="comment">%   instance that's the 5 seconds before the event starts, up to the moment</span>
+0009 <span class="comment">%   the event starts.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% See also: CEVENT_RELATIVE_INTERVALS</span>
+0012 
+0013 relative_intervals = <a href="cevent_relative_intervals.html" class="code" title="function relative_intervals = cevent_relative_intervals(cevent, whence, interval)">cevent_relative_intervals</a>(event, whence, interval);</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

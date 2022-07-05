@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of demo_timevp_extract_pairs</title>
+  <meta name="keywords" content="demo_timevp_extract_pairs">
+  <meta name="description" content="Extract pairs of events according to some temporal definition.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="index.html">timevp-main</a> &gt; demo_timevp_extract_pairs.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>demo_timevp_extract_pairs
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Extract pairs of events according to some temporal definition.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function demo_timevp_extract_pairs(demo_id) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Extract pairs of events according to some temporal definition. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ MODULE 5: Extract event pairs
+ This component extract pairs of events according to some temporal definition. 
+ E.g. the parent was displaying the toy then the infant looked at the toy within 2 seconds.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function demo_timevp_extract_pairs(demo_id)</a>
+0002 <span class="comment">% Extract pairs of events according to some temporal definition.</span>
+0003 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0004 <span class="comment">% MODULE 5: Extract event pairs</span>
+0005 <span class="comment">% This component extract pairs of events according to some temporal definition.</span>
+0006 <span class="comment">% E.g. the parent was displaying the toy then the infant looked at the toy within 2 seconds.</span>
+0007 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0008 
+0009 addpath(<span class="string">'timevp_lib'</span>)
+0010 num_demo_subs = 3;
+0011 
+0012 <span class="comment">%% Overview</span>
+0013 <span class="comment">% Finds moments from two cevents that match a specified temporal relation</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% This function will loop through all events from Variable1 (by either specifying a csv file</span>
+0016 <span class="comment">% or a variable name) and find those events in Variable2 that match the temporal</span>
+0017 <span class="comment">% relation given in the threshold parameter. These matches (or pairs)</span>
+0018 <span class="comment">% are output in a resulting CSV file.</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%% Required Arguments</span>
+0021 <span class="comment">% filename1</span>
+0022 <span class="comment">%       -- string, the full path or relative path to a</span>
+0023 <span class="comment">%          .mat or .csv file</span>
+0024 <span class="comment">%       -- data can either be cstream or cevent format</span>
+0025 <span class="comment">%       -- if .mat, data should be saved under sdata.data structure, like</span>
+0026 <span class="comment">%          in multiwork format</span>
+0027 <span class="comment">%       -- for .csv files, one can specify the number of headers and</span>
+0028 <span class="comment">%          columns, see the optional arguments below</span>
+0029 <span class="comment">% filename2</span>
+0030 <span class="comment">%         -- see filename1</span>
+0031 <span class="comment">% timing_relation</span>
+0032 <span class="comment">%         -- string of characters that indicate the temporal relations</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">%         on1 and off1 correspond to event1's onset and offset, respectively.</span>
+0035 <span class="comment">%         on2 and off2 correspond to event2's onset and offset, respectively.</span>
+0036 <span class="comment">%</span>
+0037 <span class="comment">%         'more(A,B,T)' means A comes before B with a gap more than T seconds.</span>
+0038 <span class="comment">%         'less(A,B,T)' means A comes before B with a gap less than T seconds.</span>
+0039 <span class="comment">%         A and B are to be replaced with any combination of on1, off1, on2,</span>
+0040 <span class="comment">%         and off2. T is optional, and if it is not provided, will not</span>
+0041 <span class="comment">%         consider the gap between A and B.</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">%         e.g.</span>
+0044 <span class="comment">%         timing_relation = 'more(on1, on2, 4)' means on1 must come before on2 in time,</span>
+0045 <span class="comment">%         with a gap of more than 4 seconds.</span>
+0046 <span class="comment">%         timing_relation = 'less(off2, on1, 2)' means off2 must come before on1 in time, with a</span>
+0047 <span class="comment">%         gap of less than 2 seconds.</span>
+0048 <span class="comment">%</span>
+0049 <span class="comment">%         Note, you can chain multiple timing relations together using '&amp;' or '|'. This</span>
+0050 <span class="comment">%         means AND and OR, respectively. Use parentheses to indicate</span>
+0051 <span class="comment">%         more complex timings.</span>
+0052 <span class="comment">%</span>
+0053 <span class="comment">%         e.g.</span>
+0054 <span class="comment">%         timing_relation = 'more(on1, off1, 4) &amp; less(on1, on2, 2)' means events in</span>
+0055 <span class="comment">%         Variable1 must be greater than 4 seconds long, and must start at most</span>
+0056 <span class="comment">%         2 seconds before the events in Variable2</span>
+0057 <span class="comment">%</span>
+0058 <span class="comment">% mapping</span>
+0059 <span class="comment">%         -- Nx2 array that indicates which categories are to be matched</span>
+0060 <span class="comment">%            together.</span>
+0061 <span class="comment">% savefilename</span>
+0062 <span class="comment">%         -- string indicating where to save the CSV file. The folder</span>
+0063 <span class="comment">%            must exist.</span>
+0064 
+0065 <span class="keyword">if</span> demo_id == 1
+0066     filename1 = <span class="string">'.\yulab_data\1202\cevent_eye_roi_child.csv'</span>;
+0067     filename2 = <span class="string">'.\yulab_data\1202\cevent_eye_roi_parent.csv'</span>;
+0068     timing_relation = <span class="string">'more(on1, off2, 0.3) &amp; less(off1, on2, 1)'</span>;
+0069     mapping = [(1:25)' (1:25)'];
+0070     savefilename = fullfile(<span class="string">'timevp_output_files'</span>, <span class="string">'example_extract_pairs.csv'</span>);
+0071 
+0072     timevp_extract_pairs(filename1, filename2, timing_relation, savefilename, mapping);
+0073 <span class="keyword">elseif</span> demo_id == 2
+0074     <span class="comment">% One can also extract pairs by a list of subjects, two variable names and</span>
+0075     <span class="comment">% a folder to save all csv files.</span>
+0076     variable1 = <span class="string">'cevent_eye_roi_child'</span>;
+0077     variable2 = <span class="string">'cevent_eye_roi_parent'</span>;
+0078     subject_list = [1202 1203 1204]; 
+0079     subject_list = subject_list(1:num_demo_subs);
+0080     timing_relation = <span class="string">'more(on1, off2, 0.3) &amp; less(off1, on2, 1)'</span>;
+0081     
+0082     dir_savefiles = <span class="string">'timevp_output_files'</span>;
+0083     timevp_extract_pairs_by_subject(subject_list, variable1, variable2, timing_relation, dir_savefiles);
+0084 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

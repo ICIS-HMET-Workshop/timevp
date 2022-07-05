@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of demo_timevp_compute_statistics2</title>
+  <meta name="keywords" content="demo_timevp_compute_statistics2">
+  <meta name="description" content="Example compute_statistics 2">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="index.html">timevp-main</a> &gt; demo_timevp_compute_statistics2.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>demo_timevp_compute_statistics2
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Example compute_statistics 2</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">Example compute_statistics 2
+% compute basic statistics</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%Example compute_statistics 2</span>
+0002 <span class="comment">%% compute basic statistics</span>
+0003 clear; 
+0004 addpath(<span class="string">'timevp_lib'</span>)
+0005 
+0006 <span class="comment">%% a subject list</span>
+0007 subject_list = [7002 7003 7005 7006 7008]; 
+0008 variable_name = <span class="string">'cevent_speech_naming_local-id'</span>;
+0009 output_file = <span class="string">'timevp_output_files\compute_stats2.csv'</span>; 
+0010 
+0011 
+0012 <span class="comment">%%</span>
+0013 result = timevp_compute_statistics(variable_name, subject_list); 
+0014 result = rmfield(result,{<span class="string">'data_list'</span>, <span class="string">'individual_trans_matrix'</span>});
+0015 struct2csv(result,output_file);</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

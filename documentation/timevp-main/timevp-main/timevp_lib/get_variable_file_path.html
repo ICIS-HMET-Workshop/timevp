@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of get_variable_file_path</title>
+  <meta name="keywords" content="get_variable_file_path">
+  <meta name="description" content="Returns the complete file path based on a subject and">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; get_variable_file_path.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>get_variable_file_path
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Returns the complete file path based on a subject and</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function variable_file = get_variable_file_path(sub_id, var_name) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Returns the complete file path based on a subject and
+ variable.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="get_variable_data.html" class="code" title="function data = get_variable_data(subject_id, variable_name)">get_variable_data</a>	Return subject_id and variable_name of variable</li><li><a href="has_variable.html" class="code" title="function has_it = has_variable(subject_id, var_name)">has_variable</a>	Returns true if the variable file exists in that subj's dir.</li><li><a href="save_variable_data.html" class="code" title="function data_filepath = save_variable_data(subject_id, variable_name, data)">save_variable_data</a>	Saves data to specified location with: data_filepath = '';</li><li><a href="timevp_extract_pairs_by_subject.html" class="code" title="function [allpairs, events1_wo, events2_wo] = timevp_extract_pairs_by_subject(subject_list, variable1, variable2, timing_relation, dir_savefiles, mapping, args)">timevp_extract_pairs_by_subject</a>	Extracts pairs of events for a specific subject that fit a specified temporal condition</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function variable_file = get_variable_file_path(sub_id, var_name)</a>
+0002 <span class="comment">% Returns the complete file path based on a subject and</span>
+0003 <span class="comment">% variable.</span>
+0004 [~, dir_dataset] = timevp_config_dataset_info();
+0005 
+0006 variable_file = fullfile(dir_dataset, int2str(sub_id), sprintf(<span class="string">'%s.csv'</span>, var_name));</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

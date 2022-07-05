@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of timevp_visualization_by_subject_variable</title>
+  <meta name="keywords" content="timevp_visualization_by_subject_variable">
+  <meta name="description" content="Visualization for time series data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; timevp_visualization_by_subject_variable.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>timevp_visualization_by_subject_variable
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Visualization for time series data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function timevp_visualization_by_subject_variable(subject_list, variable_list, vis_args) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Visualization for time series data</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>	Extract chunks from data, delegating based on data type</li><li><a href="get_variable_data.html" class="code" title="function data = get_variable_data(subject_id, variable_name)">get_variable_data</a>	Return subject_id and variable_name of variable</li><li><a href="visualize_streams.html" class="code" title="function visualize_streams(data, args, cont_data, cont_args)">visualize_streams</a>	Plotting function for visualizing temporal pattens</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function timevp_visualization_by_subject_variable(subject_list, variable_list, vis_args)</a>
+0002 <span class="comment">% Visualization for time series data</span>
+0003 4
+0004 <span class="keyword">if</span> isfield(vis_args, <span class="string">'windows'</span>)
+0005     windows = vis_args.windows;
+0006     is_multi_rows = true;
+0007     num_windows = size(windows, 1);
+0008     vis_args.ForceZero = true;
+0009 <span class="comment">%     vis_args.ref_column = 1;</span>
+0010     vis_args.time_ref = windows(:,1);
+0011 <span class="keyword">else</span>
+0012     windows = [];
+0013     is_multi_rows = false;
+0014     num_windows = 1;
+0015 <span class="keyword">end</span>
+0016 
+0017 <span class="keyword">if</span> isfield(vis_args, <span class="string">'is_plot_by_variable'</span>)
+0018     is_plot_by_variable = vis_args.is_plot_by_variable;
+0019 <span class="keyword">else</span>
+0020     is_plot_by_variable = false;
+0021 <span class="keyword">end</span>
+0022 
+0023 <span class="keyword">if</span> isfield(vis_args, <span class="string">'is_plot_by_subject'</span>)
+0024     is_plot_by_subject = vis_args.is_plot_by_subject;
+0025 <span class="keyword">elseif</span> is_plot_by_variable
+0026     is_plot_by_subject = false;
+0027 <span class="keyword">else</span>
+0028     is_plot_by_subject = true;
+0029 <span class="keyword">end</span>
+0030 
+0031 <span class="keyword">if</span> ~is_plot_by_subject &amp;&amp; ~is_plot_by_variable
+0032     Warning(<span class="string">'Invalid input argument setting. The function will by-default visualize streams by subject.'</span>);
+0033     is_plot_by_subject = true;
+0034 <span class="keyword">end</span>
+0035 
+0036 num_subs = length(subject_list);
+0037 num_vars = length(variable_list);
+0038 
+0039 <span class="comment">% By default, the visualization function plots multiple streams from</span>
+0040 <span class="comment">% the same subject in one plot.</span>
+0041 <span class="keyword">if</span> is_plot_by_subject
+0042     <span class="keyword">for</span> sidx = 1:num_subs
+0043         sub_id = subject_list(sidx);
+0044         plot_data = cell(num_windows, num_vars);
+0045 
+0046         <span class="keyword">for</span> vidx = 1:num_vars
+0047             var_name = variable_list{vidx};
+0048             var_data = <a href="get_variable_data.html" class="code" title="function data = get_variable_data(subject_id, variable_name)">get_variable_data</a>(sub_id, var_name);
+0049 
+0050             <span class="keyword">if</span> is_multi_rows
+0051                 extracted_data = <a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>(var_data, windows);
+0052                 <span class="keyword">if</span> ~isempty(extracted_data)
+0053                     plot_data(:, vidx) = extracted_data';
+0054                 <span class="keyword">end</span>
+0055             <span class="keyword">else</span>
+0056                 plot_data{1, vidx} = var_data;
+0057             <span class="keyword">end</span>
+0058         <span class="keyword">end</span>
+0059 
+0060         vis_args.save_name = sprintf(<span class="string">'timevp_vis_streams_%d'</span>, sub_id);
+0061         <a href="visualize_streams.html" class="code" title="function visualize_streams(data, args, cont_data, cont_args)">visualize_streams</a>(plot_data, vis_args);
+0062     <span class="keyword">end</span>
+0063 <span class="keyword">else</span>
+0064     plot_data = cell(num_windows, num_subs);
+0065     
+0066     <span class="keyword">if</span> ~isfield(vis_args, <span class="string">'annotation'</span>)
+0067         vis_args.annotation = arrayfun(@(sid) num2str(sid), subject_list, <span class="string">'UniformOutput'</span>, false);
+0068     <span class="keyword">end</span>
+0069 
+0070     <span class="keyword">for</span> vidx = 1:num_vars
+0071         var_name = variable_list{vidx};
+0072 
+0073         <span class="keyword">for</span> sidx = 1:num_subs
+0074             sub_id = subject_list(sidx);
+0075             var_data = <a href="get_variable_data.html" class="code" title="function data = get_variable_data(subject_id, variable_name)">get_variable_data</a>(sub_id, var_name);
+0076 
+0077             <span class="keyword">if</span> is_multi_rows
+0078                 extracted_data = <a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>(var_data, windows);
+0079                 <span class="keyword">if</span> ~isempty(extracted_data)
+0080                     plot_data(:, sidx) = extracted_data';
+0081                 <span class="keyword">end</span>
+0082             <span class="keyword">else</span>
+0083                 plot_data{1, sidx} = var_data;
+0084             <span class="keyword">end</span>
+0085         <span class="keyword">end</span>
+0086 
+0087         vis_args.save_name = sprintf(<span class="string">'timevp_vis_streams_%s'</span>, var_name);
+0088         <a href="visualize_streams.html" class="code" title="function visualize_streams(data, args, cont_data, cont_args)">visualize_streams</a>(plot_data, vis_args);
+0089     <span class="keyword">end</span>
+0090 <span class="keyword">end</span>
+0091 
+0092 
+0093 
+0094</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

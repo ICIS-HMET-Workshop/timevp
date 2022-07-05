@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of extract_ranges</title>
+  <meta name="keywords" content="extract_ranges">
+  <meta name="description" content="Extract chunks from data, delegating based on data type">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; extract_ranges.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>extract_ranges
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Extract chunks from data, delegating based on data type</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">Extract chunks from data, delegating based on data type
+   USAGE:
+   extract_ranges(DATA, RANGES, IS_VALUE_MATCHING)
+       For each range in RANGES, extracts that range of of data from DATA.
+       All the ranges of data are returned in a cell array.  DATA is
+       assumed to be of the type specified by DATA_TYPE.
+       When IS_VALUE_MATCHING set to true by the user, the function will
+       only return the extracted data with matched categorical value as
+       the range event.
+
+   DDATA can be a stream (nx2 matrix) or event type variable (nx3 matrix)
+   For stream, each row is formatted [timestamp value]. 
+   For events, each row is formated [start_time end_time value].
+
+   RANGES should be another nx2 or nx3 matrix (actually, any values
+   after the first two are ignored).  Each row is a time range,
+   formatted [begin_time end_time].  This is the same format as an
+   event variable or a list of experimental trials, so you could pass
+   one of those in unmodified.  All data points that have time stamps
+   such that range_start &lt;= timestamp &lt; range_end will be included in
+   the results.
+
+   The return value is a vertical cell array, with a portion of DATA in
+   each cell.  If DATA_TYPE is cont or cstream, the cells contain exact
+   copies of pieces of DATA.  If DATA_TYPE is event or cevent, then each
+   cell contains the intersection of the events with one range.
+
+   See also: CELLFUN</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="cevent_relative_intervals.html" class="code" title="function relative_intervals = cevent_relative_intervals(cevent, whence, interval)">cevent_relative_intervals</a>	Finds time relative to start or end of event</li><li><a href="get_event_in_range.html" class="code" title="function event_in_range = get_event_in_range(event, range)">get_event_in_range</a>	Return part of the events that is in the range</li><li><a href="get_matching_segments.html" class="code" title="function data_target = get_matching_segments(data_segments, data_event)">get_matching_segments</a>	Returns segments matching specified data event</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="get_data_by_subject.html" class="code" title="function [data, extra_info] = get_data_by_subject(subject_list, var_name, args)">get_data_by_subject</a>	This function fetches data by subject ID and variable name</li><li><a href="get_event_opposite.html" class="code" title="function events_out = get_event_opposite(event_data, ranges, sub_id)">get_event_opposite</a>	This function get the durations that are not within the event ranges but</li><li><a href="get_segments.html" class="code" title="function [data_segments_list, data_events_list] = get_segments(subject_list, var_name, segment_event, event_values, is_value_matching)">get_segments</a>	Get list of data segments with specified variable conditions</li><li><a href="timevp_construct_temporal_profile.html" class="code" title="function [profile_data] = timevp_construct_temporal_profile(input)">timevp_construct_temporal_profile</a>	Generates temporal profile of a group of continue variables</li><li><a href="timevp_visualization.html" class="code" title="function timevp_visualization(csvfile_list, vis_args)">timevp_visualization</a>	Display window for visualizing time series data</li><li><a href="timevp_visualization_by_subject_variable.html" class="code" title="function timevp_visualization_by_subject_variable(subject_list, variable_list, vis_args)">timevp_visualization_by_subject_variable</a>	Visualization for time series data</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function matchedArgument = matchArgumentSize(desired, realArgument)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)</a>
+0002 <span class="comment">%Extract chunks from data, delegating based on data type</span>
+0003 <span class="comment">%   USAGE:</span>
+0004 <span class="comment">%   extract_ranges(DATA, RANGES, IS_VALUE_MATCHING)</span>
+0005 <span class="comment">%       For each range in RANGES, extracts that range of of data from DATA.</span>
+0006 <span class="comment">%       All the ranges of data are returned in a cell array.  DATA is</span>
+0007 <span class="comment">%       assumed to be of the type specified by DATA_TYPE.</span>
+0008 <span class="comment">%       When IS_VALUE_MATCHING set to true by the user, the function will</span>
+0009 <span class="comment">%       only return the extracted data with matched categorical value as</span>
+0010 <span class="comment">%       the range event.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%   DDATA can be a stream (nx2 matrix) or event type variable (nx3 matrix)</span>
+0013 <span class="comment">%   For stream, each row is formatted [timestamp value].</span>
+0014 <span class="comment">%   For events, each row is formated [start_time end_time value].</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%   RANGES should be another nx2 or nx3 matrix (actually, any values</span>
+0017 <span class="comment">%   after the first two are ignored).  Each row is a time range,</span>
+0018 <span class="comment">%   formatted [begin_time end_time].  This is the same format as an</span>
+0019 <span class="comment">%   event variable or a list of experimental trials, so you could pass</span>
+0020 <span class="comment">%   one of those in unmodified.  All data points that have time stamps</span>
+0021 <span class="comment">%   such that range_start &lt;= timestamp &lt; range_end will be included in</span>
+0022 <span class="comment">%   the results.</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%   The return value is a vertical cell array, with a portion of DATA in</span>
+0025 <span class="comment">%   each cell.  If DATA_TYPE is cont or cstream, the cells contain exact</span>
+0026 <span class="comment">%   copies of pieces of DATA.  If DATA_TYPE is event or cevent, then each</span>
+0027 <span class="comment">%   cell contains the intersection of the events with one range.</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">%   See also: CELLFUN</span>
+0030 
+0031 <span class="comment">% IS_VALUE_MATCHING is not a required input argument.</span>
+0032 <span class="keyword">if</span> nargin &lt; 3
+0033     args = struct([]);
+0034 <span class="keyword">end</span>
+0035 
+0036 <span class="keyword">if</span> isfield(args, <span class="string">'is_value_matching'</span>)
+0037     is_value_matching = args.is_value_matching;
+0038 <span class="keyword">else</span>
+0039     is_value_matching = false;
+0040 <span class="keyword">end</span>
+0041 
+0042 <span class="keyword">if</span> (~isfield(args, <span class="string">'whence'</span>) &amp;&amp; isfield(args, <span class="string">'interval'</span>)) || <span class="keyword">...</span>
+0043     (isfield(args, <span class="string">'whence'</span>) &amp;&amp; ~isfield(args, <span class="string">'interval'</span>))
+0044     error([<span class="string">'Error! Input should either have both fields of '</span> <span class="keyword">...</span>
+0045         <span class="string">'''whence'' and ''interval'' or neither of them'</span>]);
+0046 <span class="keyword">end</span>
+0047 has_whence = false;
+0048 
+0049 float_tolerance = 1e-12;
+0050 
+0051 <span class="keyword">if</span> ~ iscell(all_data)
+0052     all_data = {all_data};
+0053 <span class="keyword">end</span>
+0054 
+0055 ranges_by_chunk = <a href="#_sub1" class="code" title="subfunction matchedArgument = matchArgumentSize(desired, realArgument)">matchArgumentSize</a>(all_data, all_ranges);
+0056 num_chunks = size(all_data, 1);
+0057 
+0058 all_chunks = cell(num_chunks, 1);
+0059 
+0060 <span class="keyword">if</span> isfield(args, <span class="string">'whence'</span>) &amp;&amp; isfield(args, <span class="string">'interval'</span>)
+0061     has_whence = true;
+0062     ranges_whence = cell(num_chunks, 1);
+0063 <span class="keyword">end</span>
+0064 
+0065 <span class="keyword">for</span> cidx = 1:num_chunks
+0066     data = all_data{cidx};
+0067     
+0068     <span class="keyword">if</span> isempty(data)
+0069         <span class="keyword">continue</span>
+0070     <span class="keyword">end</span>
+0071     
+0072     ranges = ranges_by_chunk{cidx};
+0073     chunks = cell(size(ranges, 1), 1);
+0074     chunk_one = [];
+0075     <span class="keyword">if</span> has_whence
+0076         range_new = [];
+0077     <span class="keyword">end</span>
+0078 
+0079     <span class="comment">% check the data format</span>
+0080     data_cols = size(data, 2);
+0081 
+0082     <span class="keyword">for</span> range_idx = 1:size(ranges, 1)
+0083         range_one = ranges(range_idx, :); <span class="comment">%range_one(1) is start, range_one(2) is end.</span>
+0084         has_range_value = size(range_one, 2) == 3;
+0085 
+0086         <span class="keyword">if</span> has_whence
+0087             range_one = <a href="cevent_relative_intervals.html" class="code" title="function relative_intervals = cevent_relative_intervals(cevent, whence, interval)">cevent_relative_intervals</a>(range_one, args.whence, args.interval);
+0088             range_new = [range_new; range_one];
+0089         <span class="keyword">end</span>
+0090 
+0091         <span class="comment">% when data is a stream</span>
+0092         <span class="keyword">if</span> data_cols == 2
+0093             <span class="comment">% These two arrays are logical indicies for data.</span>
+0094             ge_start = range_one(1) &lt;= data(:, 1) + float_tolerance;
+0095             lt_end = data(:, 1) + float_tolerance &lt; range_one(2);
+0096 
+0097             chunk_one = data(ge_start &amp; lt_end, :);
+0098         <span class="comment">% when data is event type</span>
+0099         <span class="keyword">elseif</span> data_cols == 3
+0100             chunk_one = <a href="get_event_in_range.html" class="code" title="function event_in_range = get_event_in_range(event, range)">get_event_in_range</a>(data, range_one);
+0101         <span class="keyword">else</span>
+0102             error([<span class="string">'extract_ranges:invalid data type. The input data can only be stream [time category_number]'</span>, <span class="keyword">...</span>
+0103             <span class="string">' or event type [time_start time_end category_number].'</span>]);
+0104         <span class="keyword">end</span>
+0105 
+0106         <span class="comment">% if the user only wants data with matching value</span>
+0107         <span class="keyword">if</span> has_range_value &amp;&amp; is_value_matching
+0108             chunk_one = <a href="get_matching_segments.html" class="code" title="function data_target = get_matching_segments(data_segments, data_event)">get_matching_segments</a>(chunk_one, range_one);
+0109         <span class="keyword">end</span>
+0110 
+0111         chunks{range_idx} = chunk_one;
+0112     <span class="keyword">end</span>
+0113     <span class="keyword">if</span> has_whence
+0114         ranges_whence{cidx} = range_new;
+0115     <span class="keyword">end</span>
+0116     all_chunks{cidx} = chunks;
+0117 <span class="keyword">end</span>
+0118 
+0119 <span class="keyword">if</span> has_whence
+0120     ranges_by_chunk = ranges_whence;
+0121 <span class="keyword">end</span>
+0122 
+0123 <span class="keyword">if</span> num_chunks == 1
+0124     all_chunks = all_chunks{1};
+0125     extracted_info.ranges = ranges_by_chunk{1};
+0126 <span class="keyword">else</span>
+0127     extracted_info.ranges = ranges_by_chunk;
+0128 <span class="keyword">end</span>
+0129 
+0130 <span class="keyword">end</span>
+0131 
+0132 <a name="_sub1" href="#_subfunctions" class="code">function matchedArgument = matchArgumentSize(desired, realArgument)</a>
+0133 <span class="comment">% matchArgumentSize(desired, realArgument)</span>
+0134 <span class="comment">% Returns a cell array of arguments with the same size as</span>
+0135 <span class="comment">% DESIRED, so then you can loop through desired and the</span>
+0136 <span class="comment">% arguments together.</span>
+0137 <span class="comment">%</span>
+0138 <span class="comment">% if realArgument is not a cell array, it duplicates it once</span>
+0139 <span class="comment">% for each element in desired.</span>
+0140 <span class="comment">%</span>
+0141 <span class="comment">% if realArgument is a cell array, it makes sure it's the same</span>
+0142 <span class="comment">% size as DESIRED.</span>
+0143 <span class="keyword">if</span> ~ iscell(realArgument)
+0144     matchedArgument = repmat({ realArgument }, size(desired));
+0145 <span class="keyword">else</span>
+0146     <span class="keyword">if</span> ~ isequal(size(desired), size(realArgument))
+0147         error(<span class="string">'Argument must be non-cell, or cell with same size as other arguments'</span>);
+0148     <span class="keyword">end</span>
+0149     matchedArgument = realArgument;
+0150 <span class="keyword">end</span>
+0151 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

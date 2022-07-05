@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of demo_timevp_compute_statistics</title>
+  <meta name="keywords" content="demo_timevp_compute_statistics">
+  <meta name="description" content="Compute statistics on provided time series data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="index.html">timevp-main</a> &gt; demo_timevp_compute_statistics.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>demo_timevp_compute_statistics
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Compute statistics on provided time series data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function demo_timevp_compute_statistics(demo_id) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Compute statistics on provided time series data 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ MODULE 2: Compute statistics
+ E.g. compare infant looking behavior vs parent looking behavior vs
+       parent holding behavior
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function demo_timevp_compute_statistics(demo_id)</a>
+0002 <span class="comment">% Compute statistics on provided time series data</span>
+0003 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0004 <span class="comment">% MODULE 2: Compute statistics</span>
+0005 <span class="comment">% E.g. compare infant looking behavior vs parent looking behavior vs</span>
+0006 <span class="comment">%       parent holding behavior</span>
+0007 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0008 
+0009 addpath(<span class="string">'timevp_lib'</span>)
+0010 
+0011 <span class="keyword">if</span> demo_id == 1
+0012     <span class="comment">% Get subject list</span>
+0013     subject_list = [1202 1203 1204];
+0014     variable_child_eye = <span class="string">'cevent_eye_roi_child'</span>;
+0015     stats_child_eye_toyroom = timevp_compute_statistics(variable_child_eye, subject_list);
+0016 
+0017     <span class="comment">% Example result:</span>
+0018     <span class="comment">% stats_child_eye =</span>
+0019     <span class="comment">%</span>
+0020     <span class="comment">%   struct with fields:</span>
+0021     <span class="comment">%</span>
+0022     <span class="comment">%                       categories: [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25]</span>
+0023     <span class="comment">%                     total_number: 6161</span>
+0024     <span class="comment">%                individual_number: [35×1 double]</span>
+0025     <span class="comment">%              total_number_by_cat: [262 256 285 113 209 245 203 262 204 284 214 149 207 156 451 180 406 166 190 383 332 292 282 234 196]</span>
+0026     <span class="comment">%         individual_number_by_cat: [35×25 double]</span>
+0027     <span class="comment">%                         mean_dur: 1.8371</span>
+0028     <span class="comment">%              individual_mean_dur: [35×1 double]</span>
+0029     <span class="comment">%               individual_std_dur: [35×1 double]</span>
+0030     <span class="comment">%                  mean_dur_by_cat: [1×25 double]</span>
+0031     <span class="comment">%       individual_mean_dur_by_cat: [35×25 double]</span>
+0032     <span class="comment">%                       median_dur: 0.9670</span>
+0033     <span class="comment">%            individual_median_dur: [35×1 double]</span>
+0034     <span class="comment">%                median_dur_by_cat: [1×25 double]</span>
+0035     <span class="comment">%     individual_median_dur_by_cat: [35×25 double]</span>
+0036     <span class="comment">%                         switches: 5614</span>
+0037     <span class="comment">%              individual_switches: [35×1 double]</span>
+0038     <span class="comment">%                     trans_matrix: [25×25 double]</span>
+0039     <span class="comment">%          individual_trans_matrix: {36×625 cell}</span>
+0040     <span class="comment">%                trans_freq_matrix: [25×25 double]</span>
+0041     <span class="comment">%                        data_list: {35×1 cell}</span>
+0042     
+0043 <span class="keyword">elseif</span> demo_id == 2
+0044     subject_list = [7007 7010 7011];
+0045     variable_child_eye = <span class="string">'cstream_eye_roi_child'</span>;
+0046     stats_child_eye_storybook = timevp_compute_statistics(variable_child_eye, subject_list);
+0047     
+0048     <span class="comment">% Example result:</span>
+0049     <span class="comment">% stats_child_eye_storybook =</span>
+0050     <span class="comment">%</span>
+0051     <span class="comment">%   struct with fields:</span>
+0052     <span class="comment">%</span>
+0053     <span class="comment">%                subject_list: [45×1 double]</span>
+0054     <span class="comment">%                  categories: [1×43 double]</span>
+0055     <span class="comment">%                        prop: 0.6937</span>
+0056     <span class="comment">%                 prop_by_cat: [1×43 double]</span>
+0057     <span class="comment">%             individual_prop: [45×1 double]</span>
+0058     <span class="comment">%      individual_prop_by_cat: [45×43 double]</span>
+0059     <span class="comment">%                trans_matrix: [42×42 double]</span>
+0060     <span class="comment">%     individual_trans_matrix: {46×1764 cell}</span>
+0061     <span class="comment">%                 EVENT_STATS: '----------convert to events from here-----------'</span>
+0062     <span class="comment">%                 event_stats: [1×1 struct]</span>
+0063     <span class="comment">%                   data_list: {45×1 cell}</span>
+0064     
+0065     
+0066 <span class="keyword">elseif</span> demo_id == 3
+0067     subject_list = [1202 1203 1204];
+0068     variable_parent_naming = <span class="string">'cevent_speech_naming_local-id'</span>;
+0069     stats_parent_naming = timevp_compute_statistics(variable_parent_naming, subject_list);
+0070     
+0071     <span class="comment">% Example result:</span>
+0072     <span class="comment">% stats_parent_naming =</span>
+0073     <span class="comment">%</span>
+0074     <span class="comment">%   struct with fields:</span>
+0075     <span class="comment">%</span>
+0076     <span class="comment">%                       categories: [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24]</span>
+0077     <span class="comment">%                     total_number: 1287</span>
+0078     <span class="comment">%                individual_number: [35×1 double]</span>
+0079     <span class="comment">%              total_number_by_cat: [85 84 64 29 61 49 72 43 46 64 71 33 52 43 117 39 39 50 39 61 31 31 59 25]</span>
+0080     <span class="comment">%         individual_number_by_cat: [35×24 double]</span>
+0081     <span class="comment">%                         mean_dur: 1.7407</span>
+0082     <span class="comment">%              individual_mean_dur: [35×1 double]</span>
+0083     <span class="comment">%               individual_std_dur: [35×1 double]</span>
+0084     <span class="comment">%                  mean_dur_by_cat: [1×24 double]</span>
+0085     <span class="comment">%       individual_mean_dur_by_cat: [35×24 double]</span>
+0086     <span class="comment">%                       median_dur: 1.3600</span>
+0087     <span class="comment">%            individual_median_dur: [35×1 double]</span>
+0088     <span class="comment">%                median_dur_by_cat: [1×24 double]</span>
+0089     <span class="comment">%     individual_median_dur_by_cat: [35×24 double]</span>
+0090     <span class="comment">%                         switches: 747</span>
+0091     <span class="comment">%              individual_switches: [35×1 double]</span>
+0092     <span class="comment">%                     trans_matrix: [24×24 double]</span>
+0093     <span class="comment">%          individual_trans_matrix: {36×576 cell}</span>
+0094     <span class="comment">%                trans_freq_matrix: [24×24 double]</span>
+0095     <span class="comment">%                        data_list: {35×1 cell}</span>
+0096 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

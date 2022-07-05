@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of get_matching_segments</title>
+  <meta name="keywords" content="get_matching_segments">
+  <meta name="description" content="Returns segments matching specified data event">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; get_matching_segments.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>get_matching_segments
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Returns segments matching specified data event</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function data_target = get_matching_segments(data_segments, data_event) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Returns segments matching specified data event</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>	Extract chunks from data, delegating based on data type</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function data_target = get_matching_segments(data_segments, data_event)</a>
+0002 <span class="comment">% Returns segments matching specified data event</span>
+0003 is_data_cell = iscell(data_segments);
+0004 
+0005 <span class="keyword">if</span> is_data_cell
+0006     num_segments = length(data_segments);
+0007     num_events = size(data_event, 1);
+0008 
+0009     <span class="keyword">if</span> num_segments ~= num_events
+0010         error(<span class="string">'Invalid input. The number of segments should be the same as the number of events.'</span>)
+0011     <span class="keyword">end</span>
+0012 
+0013     data_target = cell(num_segments, 1);
+0014 
+0015     <span class="keyword">for</span> sgidx = 1:num_segments
+0016         segment_one = data_segments{sgidx};
+0017         target_code = data_event(sgidx, end);
+0018         segment_target = segment_one(segment_one(:,end) == target_code, :);
+0019         data_target{sgidx} = segment_target;
+0020     <span class="keyword">end</span>
+0021 <span class="keyword">else</span>
+0022     num_events = size(data_event, 1);
+0023     <span class="keyword">if</span> num_events ~= 1
+0024         error(<span class="string">'Invalid input. When data is one matrix, the function can only take in 1 event.'</span>)
+0025     <span class="keyword">end</span>
+0026     target_code = data_event(1, end);
+0027     data_target = data_segments(data_segments(:,end) == target_code, :);
+0028 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

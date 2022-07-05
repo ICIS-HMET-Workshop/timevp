@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of cevent_relative_intervals</title>
+  <meta name="keywords" content="cevent_relative_intervals">
+  <meta name="description" content="Finds time relative to start or end of event">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; cevent_relative_intervals.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>cevent_relative_intervals
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Finds time relative to start or end of event</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function relative_intervals = cevent_relative_intervals(cevent, whence, interval) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Finds time relative to start or end of event
+
+ cevent_relative_intervals(cevent, 'start', [-5 0])
+   Make a new cevent.  For each instance of the original event, make a new
+   instance that's the 5 seconds before the event starts, up to the moment
+   the event starts.  Each new event will have the same ID as the original
+   event that it was based on.
+
+ cevent_relative_intervals(cevent, 'end', [-2 3])
+   Make a new cevent, with the time bounds as 2 seconds before to 3
+   seconds after the end of the original event.
+
+ cevent_relative_intervals(cevent, 'startend', [1, -1])
+   Make a new cevent, which is like the original event, but &quot;shrunken&quot; by
+   1 second on each end.  WARNING: this may lead to an event with negative
+   length, if the original event is less than 2 seconds long.
+   (cevent_relative_intervals will emit a warning in this case)
+
+ If the input variable is a plain event (2 columns) rather than a cevent
+ (3 columns), that's handled, and the output will also be a 2-column
+ event.
+
+ The most straightforward way to use the function is to create another
+ cevent, by having the INTERVAL argument be two elements long.  However,
+ if you just wanted to find out a single point in time for each event, you
+ could specify an INTERVAL like [-3], just one element long.  Or you could
+ specify an INTERVAL that had 3 elements.  I don't know if this would be
+ useful, but it was easy to write the function this way, so I'll just go
+ ahead and document it.
+
+ Example:
+
+ &gt;&gt; cevent = [0 10 1; 20 21 2; 80 85 3]
+ cevent =
+      0    10     1
+     20    21     2
+     80    85     3
+
+ &gt;&gt; cevent_relative_intervals(cevent, 'start', [-1 1]) 
+ ans =
+     -1     1     1
+     19    21     2
+     79    81     3
+ 
+ &gt;&gt; cevent_relative_intervals(cevent, 'end', [-1 1])
+ ans =
+      9    11     1
+     20    22     2
+     84    86     3
+
+ &gt;&gt; % Add 0 to start time and 0 to end time:
+ &gt;&gt; % Should get the cevent back with no changes
+ &gt;&gt; isequal(cevent, cevent_relative_intervals(cevent, 'startend', [0 0]))
+ ans = 1
+
+ &gt;&gt; % Make an event with negative length
+ &gt;&gt; cevent_relative_intervals(cevent, 'startend', [5 -5])
+ Warning: You seem to have constructed an event that ends before it
+ begins!
+ ***</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="cevent_relative_intervals.html" class="code" title="function relative_intervals = cevent_relative_intervals(cevent, whence, interval)">cevent_relative_intervals</a>	Finds time relative to start or end of event</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="cevent_relative_intervals.html" class="code" title="function relative_intervals = cevent_relative_intervals(cevent, whence, interval)">cevent_relative_intervals</a>	Finds time relative to start or end of event</li><li><a href="event_relative_intervals.html" class="code" title="function relative_intervals = event_relative_intervals(event, whence, interval)">event_relative_intervals</a>	Find time relative to start or end of events</li><li><a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>	Extract chunks from data, delegating based on data type</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function relative_intervals = do_startend(cevent, interval)</a></li><li><a href="#_sub2" class="code">function check_non_negative(relative_intervals, time_columns)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function relative_intervals = cevent_relative_intervals(cevent, whence, interval)</a>
+0002 <span class="comment">% Finds time relative to start or end of event</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% cevent_relative_intervals(cevent, 'start', [-5 0])</span>
+0005 <span class="comment">%   Make a new cevent.  For each instance of the original event, make a new</span>
+0006 <span class="comment">%   instance that's the 5 seconds before the event starts, up to the moment</span>
+0007 <span class="comment">%   the event starts.  Each new event will have the same ID as the original</span>
+0008 <span class="comment">%   event that it was based on.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% cevent_relative_intervals(cevent, 'end', [-2 3])</span>
+0011 <span class="comment">%   Make a new cevent, with the time bounds as 2 seconds before to 3</span>
+0012 <span class="comment">%   seconds after the end of the original event.</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% cevent_relative_intervals(cevent, 'startend', [1, -1])</span>
+0015 <span class="comment">%   Make a new cevent, which is like the original event, but &quot;shrunken&quot; by</span>
+0016 <span class="comment">%   1 second on each end.  WARNING: this may lead to an event with negative</span>
+0017 <span class="comment">%   length, if the original event is less than 2 seconds long.</span>
+0018 <span class="comment">%   (cevent_relative_intervals will emit a warning in this case)</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% If the input variable is a plain event (2 columns) rather than a cevent</span>
+0021 <span class="comment">% (3 columns), that's handled, and the output will also be a 2-column</span>
+0022 <span class="comment">% event.</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% The most straightforward way to use the function is to create another</span>
+0025 <span class="comment">% cevent, by having the INTERVAL argument be two elements long.  However,</span>
+0026 <span class="comment">% if you just wanted to find out a single point in time for each event, you</span>
+0027 <span class="comment">% could specify an INTERVAL like [-3], just one element long.  Or you could</span>
+0028 <span class="comment">% specify an INTERVAL that had 3 elements.  I don't know if this would be</span>
+0029 <span class="comment">% useful, but it was easy to write the function this way, so I'll just go</span>
+0030 <span class="comment">% ahead and document it.</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">% Example:</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">% &gt;&gt; cevent = [0 10 1; 20 21 2; 80 85 3]</span>
+0035 <span class="comment">% cevent =</span>
+0036 <span class="comment">%      0    10     1</span>
+0037 <span class="comment">%     20    21     2</span>
+0038 <span class="comment">%     80    85     3</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">% &gt;&gt; cevent_relative_intervals(cevent, 'start', [-1 1])</span>
+0041 <span class="comment">% ans =</span>
+0042 <span class="comment">%     -1     1     1</span>
+0043 <span class="comment">%     19    21     2</span>
+0044 <span class="comment">%     79    81     3</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">% &gt;&gt; cevent_relative_intervals(cevent, 'end', [-1 1])</span>
+0047 <span class="comment">% ans =</span>
+0048 <span class="comment">%      9    11     1</span>
+0049 <span class="comment">%     20    22     2</span>
+0050 <span class="comment">%     84    86     3</span>
+0051 <span class="comment">%</span>
+0052 <span class="comment">% &gt;&gt; % Add 0 to start time and 0 to end time:</span>
+0053 <span class="comment">% &gt;&gt; % Should get the cevent back with no changes</span>
+0054 <span class="comment">% &gt;&gt; isequal(cevent, cevent_relative_intervals(cevent, 'startend', [0 0]))</span>
+0055 <span class="comment">% ans = 1</span>
+0056 <span class="comment">%</span>
+0057 <span class="comment">% &gt;&gt; % Make an event with negative length</span>
+0058 <span class="comment">% &gt;&gt; cevent_relative_intervals(cevent, 'startend', [5 -5])</span>
+0059 <span class="comment">% Warning: You seem to have constructed an event that ends before it</span>
+0060 <span class="comment">% begins!</span>
+0061 <span class="comment">% ***</span>
+0062 <span class="comment">%</span>
+0063 
+0064 <span class="comment">% find what thing we should use to calculate the times from</span>
+0065 <span class="keyword">switch</span> whence
+0066     <span class="keyword">case</span> <span class="string">'start'</span>
+0067         basis = cevent(:, 1);
+0068     <span class="keyword">case</span> <span class="string">'end'</span>
+0069         basis = cevent(:, 2);
+0070     <span class="keyword">case</span> <span class="string">'startend'</span>
+0071         <span class="comment">% Will call this function again with a different WHENCE argument.</span>
+0072         relative_intervals = <a href="#_sub1" class="code" title="subfunction relative_intervals = do_startend(cevent, interval)">do_startend</a>(cevent, interval);
+0073         <span class="keyword">return</span>
+0074         
+0075     <span class="keyword">otherwise</span>
+0076         error(<span class="string">'The WHENCE argument must be either ''start'' or ''end''.'</span>);
+0077 <span class="keyword">end</span>
+0078 
+0079 <span class="comment">% make the time columns by adding each element of the interval to each</span>
+0080 <span class="comment">% element of the time, in the correct column</span>
+0081 [time_grid, offset_grid] = ndgrid(interval, basis);
+0082 timestamps = time_grid' + offset_grid';
+0083 
+0084 
+0085 <span class="keyword">if</span> size(cevent, 2) &gt; 2
+0086     relative_intervals = [timestamps cevent(:, 3:end)];
+0087 <span class="keyword">else</span>
+0088     relative_intervals = timestamps;
+0089 <span class="keyword">end</span>
+0090 
+0091 <a href="#_sub2" class="code" title="subfunction check_non_negative(relative_intervals, time_columns)">check_non_negative</a>(relative_intervals, numel(interval));
+0092 <span class="keyword">end</span>
+0093 
+0094 
+0095 
+0096 <a name="_sub1" href="#_subfunctions" class="code">function relative_intervals = do_startend(cevent, interval)</a>
+0097 <span class="comment">% deal with the specialness of doing one part from the start and one from</span>
+0098 <span class="comment">% the end</span>
+0099 
+0100 <span class="keyword">if</span> size(interval) ~= [1,2]
+0101     error(<span class="string">'For a ''startend'' interval, the INTERVAL argument must be a 1x2 matrix.'</span>);
+0102 <span class="keyword">end</span>
+0103 
+0104 from_start = <a href="cevent_relative_intervals.html" class="code" title="function relative_intervals = cevent_relative_intervals(cevent, whence, interval)">cevent_relative_intervals</a>(cevent, <span class="string">'start'</span>, interval(1));
+0105 
+0106 from_end = <a href="cevent_relative_intervals.html" class="code" title="function relative_intervals = cevent_relative_intervals(cevent, whence, interval)">cevent_relative_intervals</a>(cevent, <span class="string">'end'</span>, interval(2));
+0107 
+0108 <span class="comment">% there's a duplicate of the category column so you have to do (:,1)</span>
+0109 relative_intervals = horzcat(from_start(:, 1), from_end);
+0110 
+0111 <a href="#_sub2" class="code" title="subfunction check_non_negative(relative_intervals, time_columns)">check_non_negative</a>(relative_intervals, 2);
+0112 <span class="keyword">end</span>
+0113 
+0114 
+0115 <a name="_sub2" href="#_subfunctions" class="code">function check_non_negative(relative_intervals, time_columns)</a>
+0116 <span class="comment">% Make sure that, for all the events E, the start time of E is before the</span>
+0117 <span class="comment">% end time of E.</span>
+0118 
+0119 <span class="keyword">if</span> ~ all(diff(relative_intervals(:, 1:time_columns), 1, 2) &gt;= 0)
+0120     warning(<span class="string">'cevent_relative_intervals:negative_event_duration'</span>, <span class="keyword">...</span>
+0121         <span class="string">'You seem to have constructed an event that ends before it begins!'</span>);
+0122 <span class="keyword">end</span>
+0123 <span class="keyword">end</span>
+0124</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

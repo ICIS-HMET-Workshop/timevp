@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of demo_timevp_extract_pairs1</title>
+  <meta name="keywords" content="demo_timevp_extract_pairs1">
+  <meta name="description" content="Demo timevp_extract_pairs 1">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="index.html">timevp-main</a> &gt; demo_timevp_extract_pairs1.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>demo_timevp_extract_pairs1
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Demo timevp_extract_pairs 1</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Demo timevp_extract_pairs 1</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001  <span class="comment">% Demo timevp_extract_pairs 1</span>
+0002 
+0003 clear;
+0004 addpath(<span class="string">'timevp_lib'</span>); 
+0005 
+0006 <span class="comment">% timing_relation</span>
+0007 <span class="comment">%         -- string of characters that indicate the temporal relations</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%         on1 and off1 correspond to event1's onset and offset, respectively.</span>
+0010 <span class="comment">%         on2 and off2 correspond to event2's onset and offset, respectively.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%         'more(A,B,T)' means A comes before B with a gap more than T seconds.</span>
+0013 <span class="comment">%         'less(A,B,T)' means A comes before B with a gap less than T seconds.</span>
+0014 <span class="comment">%         A and B are to be replaced with any combination of on1, off1, on2,</span>
+0015 <span class="comment">%         and off2. T is optional, and if it is not provided, will not</span>
+0016 <span class="comment">%         consider the gap between A and B.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%         e.g.</span>
+0019 <span class="comment">%         timing_relation = 'more(on1, on2, 4)' means on1 must come before on2 in time,</span>
+0020 <span class="comment">%         with a gap of more than 4 seconds.</span>
+0021 <span class="comment">%         timing_relation = 'less(off2, on1, 2)' means off2 must come before on1 in time, with a</span>
+0022 <span class="comment">%         gap of less than 2 seconds.</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%         Note, you can chain multiple timing relations together using '&amp;' or '|'. This</span>
+0025 <span class="comment">%         means AND and OR, respectively. Use parentheses to indicate</span>
+0026 <span class="comment">%         more complex timings.</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">%         e.g.</span>
+0029 <span class="comment">%         timing_relation = 'more(on1, off1, 4) &amp; less(on1, on2, 2)' means events in</span>
+0030 <span class="comment">%         Variable1 must be greater than 4 seconds long, and must start at most</span>
+0031 <span class="comment">%         2 seconds before the events in Variable2</span>
+0032 
+0033 <span class="comment">%%</span>
+0034 variable1 = <span class="string">'cevent_eye_roi_child'</span>;
+0035 variable2 = <span class="string">'cevent_eye_roi_parent'</span>;
+0036 subject_list = [7002 7003 7006];
+0037 timing_relation = <span class="string">'more(on2, off1) &amp; more(on1, on2)'</span>;
+0038 dir_savefiles = <span class="string">'timevp_output_files'</span>;
+0039 <span class="comment">%%</span>
+0040 timevp_extract_pairs_by_subject(subject_list, variable1, variable2, timing_relation, dir_savefiles);
+0041 
+0042</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

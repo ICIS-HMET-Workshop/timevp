@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of event2stream</title>
+  <meta name="keywords" content="event2stream">
+  <meta name="description" content="Generate stream from events">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; event2stream.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>event2stream
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Generate stream from events</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function stream = event2stream(events, sample_rate, default_value, start_time, end_time) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Generate stream from events
+
+ Warning:
+ Note that this is a lossy conversion: if there are overlapping events in
+ the events, then only one of them will come through in the stream.
+
+ stream = event2stream(events, sample_rate, default_value, start_time, end_time)
+ 
+ INPUT
+   events:  input events data
+   sample_rate: the interval between two consecutive time stamps of converted
+           stream data.
+   default_value:  the default_value value for converted stream data
+   start_time: the timestamp when the converted stream starts.
+   end_time: (optional) the timestamp when the converted stream ends.
+ 
+ OUTPUT
+   stream:      the converted stream</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="get_data_by_subject.html" class="code" title="function [data, extra_info] = get_data_by_subject(subject_list, var_name, args)">get_data_by_subject</a>	This function fetches data by subject ID and variable name</li><li><a href="regroup_data.html" class="code" title="function [var_data_regroup] = regroup_data(var_data, var_category, events, event_category, groupid_matrix)">regroup_data</a>	Structure new grops of data</li><li><a href="timevp_construct_temporal_profile.html" class="code" title="function [profile_data] = timevp_construct_temporal_profile(input)">timevp_construct_temporal_profile</a>	Generates temporal profile of a group of continue variables</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function stream = event2stream(events, sample_rate, default_value, start_time, end_time)</a>
+0002 <span class="comment">% Generate stream from events</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Warning:</span>
+0005 <span class="comment">% Note that this is a lossy conversion: if there are overlapping events in</span>
+0006 <span class="comment">% the events, then only one of them will come through in the stream.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% stream = event2stream(events, sample_rate, default_value, start_time, end_time)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% INPUT</span>
+0011 <span class="comment">%   events:  input events data</span>
+0012 <span class="comment">%   sample_rate: the interval between two consecutive time stamps of converted</span>
+0013 <span class="comment">%           stream data.</span>
+0014 <span class="comment">%   default_value:  the default_value value for converted stream data</span>
+0015 <span class="comment">%   start_time: the timestamp when the converted stream starts.</span>
+0016 <span class="comment">%   end_time: (optional) the timestamp when the converted stream ends.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% OUTPUT</span>
+0019 <span class="comment">%   stream:      the converted stream</span>
+0020 
+0021 <span class="keyword">if</span> isempty(events)
+0022     warning(<span class="string">'Input events is empty. Return empty stream.'</span>);
+0023     stream = zeros(0, 2);
+0024     <span class="keyword">return</span>;
+0025 <span class="keyword">end</span>
+0026 
+0027 <span class="keyword">if</span> size(events, 2) ~= 3
+0028     error(<span class="string">'Input events must be in this type of data structure: [onset offset category]'</span>);
+0029 <span class="keyword">end</span>
+0030 
+0031 <span class="keyword">if</span> nargin &lt; 2
+0032     sample_rate = timevp_config_dataset_info();
+0033 <span class="keyword">end</span>
+0034 
+0035 <span class="keyword">if</span> nargin &lt; 3
+0036     default_value = 0;
+0037 <span class="keyword">end</span>
+0038 
+0039 <span class="keyword">if</span> nargin &lt; 4 
+0040     start_time = events(1, 1);
+0041 <span class="keyword">end</span>
+0042 
+0043 <span class="keyword">if</span> nargin &lt; 5
+0044     end_time = events(<span class="keyword">end</span>, 2);
+0045 <span class="keyword">end</span>
+0046 
+0047 time_base = start_time:sample_rate:end_time;
+0048 
+0049 <span class="comment">% change to account for empty events</span>
+0050 <span class="keyword">if</span> size(events,1) == 0
+0051     event_count = 0;
+0052     start = 0;
+0053     stop = 0;
+0054 <span class="keyword">else</span>
+0055     event_count = 1;
+0056     start = events(1,1);
+0057     stop = events(1,2);
+0058 <span class="keyword">end</span>
+0059 
+0060 total = length(time_base);
+0061 stream = zeros(total,2);
+0062 stream(:,1) = time_base;
+0063 stream(:,2) = default_value;
+0064 total_event = size(events, 1);
+0065 
+0066 <span class="comment">% For each time</span>
+0067 <span class="keyword">for</span> i = 1:total
+0068     time = time_base(i);
+0069     
+0070     <span class="comment">% if this time is past the stop of the events, search for a new events.</span>
+0071     <span class="keyword">while</span>(time &gt;= stop &amp;&amp; event_count &lt; total_event)
+0072         event_count = event_count + 1;
+0073         start = events(event_count ,1);
+0074         stop = events(event_count ,2);
+0075     <span class="keyword">end</span>
+0076 
+0077     <span class="comment">% Check if before events</span>
+0078     <span class="keyword">if</span>(time &lt; start)
+0079         stream(i,2) = 0;
+0080     <span class="keyword">elseif</span> (time &lt; stop) <span class="comment">% not before.  During?</span>
+0081         stream(i,2) = events(event_count, 3);
+0082     <span class="keyword">else</span> <span class="comment">% Not before or during.  After.</span>
+0083         <span class="comment">% This should only happen when we've run out of events.</span>
+0084         assert(event_count == total_event);
+0085         <span class="comment">% The rest of the variable should be zeros, which it already is.</span>
+0086         <span class="comment">% We're done!</span>
+0087         <span class="keyword">break</span>
+0088     <span class="keyword">end</span>
+0089 <span class="keyword">end</span>
+0090 
+0091 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

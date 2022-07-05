@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of cevent_reassign_categories</title>
+  <meta name="keywords" content="cevent_reassign_categories">
+  <meta name="description" content="This function reassign/regroup cevents with new roi values that are">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; cevent_reassign_categories.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>cevent_reassign_categories
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>This function reassign/regroup cevents with new roi values that are</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function new_cevents = cevent_reassign_categories(cevents, old_roi_list, new_roi_list) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">This function reassign/regroup cevents with new roi values that are
+specified by the users. So that statistics can be calculated based on new
+groups.
+ 
+ example for ressigning cevent category values for an experiment.
+ 
+ exp_id = 53;
+ sub_list = list_subjects(exp_id);
+ input.sub_list = sub_list;
+ input.var_name = 'cevent_eye_roi_follow_nao';
+ chunks_follow_tmp = get_variable_by_grouping('sub', sub_list, follow_name, grouping, input);
+ 
+ old_roi_list = {[1 2 3]; [4]; [10 25]}
+ new_roi_list = {[1]; [4]; [99]}
+ 
+ chunks_follow = cellfun(@(chunk_one) ...
+     cevent_reassign_categories(chunk_one, old_roi_list, new_roi_list), ...
+     chunks_follow_tmp, ...
+     'UniformOutput', false);
+ 
+ results = cevent_cal_stats(chunks_follow, input);</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="regroup_data.html" class="code" title="function [var_data_regroup] = regroup_data(var_data, var_category, events, event_category, groupid_matrix)">regroup_data</a>	Structure new grops of data</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function new_cevents = cevent_reassign_categories(cevents, old_roi_list, new_roi_list)</a>
+0002 <span class="comment">%This function reassign/regroup cevents with new roi values that are</span>
+0003 <span class="comment">%specified by the users. So that statistics can be calculated based on new</span>
+0004 <span class="comment">%groups.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% example for ressigning cevent category values for an experiment.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% exp_id = 53;</span>
+0009 <span class="comment">% sub_list = list_subjects(exp_id);</span>
+0010 <span class="comment">% input.sub_list = sub_list;</span>
+0011 <span class="comment">% input.var_name = 'cevent_eye_roi_follow_nao';</span>
+0012 <span class="comment">% chunks_follow_tmp = get_variable_by_grouping('sub', sub_list, follow_name, grouping, input);</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% old_roi_list = {[1 2 3]; [4]; [10 25]}</span>
+0015 <span class="comment">% new_roi_list = {[1]; [4]; [99]}</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% chunks_follow = cellfun(@(chunk_one) ...</span>
+0018 <span class="comment">%     cevent_reassign_categories(chunk_one, old_roi_list, new_roi_list), ...</span>
+0019 <span class="comment">%     chunks_follow_tmp, ...</span>
+0020 <span class="comment">%     'UniformOutput', false);</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% results = cevent_cal_stats(chunks_follow, input);</span>
+0023 
+0024 <span class="keyword">if</span> ~isempty(cevents)
+0025     new_cevents = cevents(:,:);
+0026 
+0027     <span class="keyword">if</span> isempty(old_roi_list)
+0028         <span class="keyword">if</span> ~iscell(new_roi_list) &amp;&amp; (length(new_roi_list) == 1)
+0029             assign_mask = cevents(:,3) &gt; 0;
+0030             new_cevents(assign_mask,3) = new_roi_list;
+0031         <span class="keyword">else</span>
+0032             error([<span class="string">'Invalid_parameter: when old_roi_list is empty, '</span> <span class="keyword">...</span>
+0033                 <span class="string">'the new_roi_list must not be one number'</span>]);
+0034         <span class="keyword">end</span>
+0035     <span class="keyword">else</span>
+0036 
+0037         <span class="keyword">for</span> i = 1:length(old_roi_list)
+0038             old_rois = old_roi_list{i};
+0039             new_roi = new_roi_list{i};
+0040 
+0041             <span class="keyword">if</span> length(new_roi) &gt; 1
+0042                 error(<span class="string">'New roi can only be length 1'</span>);
+0043             <span class="keyword">end</span>
+0044 
+0045             assign_mask = ismember(cevents(:,3), old_rois);
+0046             new_cevents(assign_mask,3) = new_roi;
+0047         <span class="keyword">end</span>
+0048     <span class="keyword">end</span>
+0049 <span class="keyword">else</span>
+0050     new_cevents = cevents;
+0051 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

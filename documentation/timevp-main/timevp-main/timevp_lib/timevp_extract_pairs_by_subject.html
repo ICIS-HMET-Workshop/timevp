@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of timevp_extract_pairs_by_subject</title>
+  <meta name="keywords" content="timevp_extract_pairs_by_subject">
+  <meta name="description" content="Extracts pairs of events for a specific subject that fit a specified temporal condition">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; timevp_extract_pairs_by_subject.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>timevp_extract_pairs_by_subject
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Extracts pairs of events for a specific subject that fit a specified temporal condition</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [allpairs, events1_wo, events2_wo] = timevp_extract_pairs_by_subject(subject_list, variable1, variable2, timing_relation, dir_savefiles, mapping, args) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Extracts pairs of events for a specific subject that fit a specified temporal condition</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="get_variable_file_path.html" class="code" title="function variable_file = get_variable_file_path(sub_id, var_name)">get_variable_file_path</a>	Returns the complete file path based on a subject and</li><li><a href="has_variable.html" class="code" title="function has_it = has_variable(subject_id, var_name)">has_variable</a>	Returns true if the variable file exists in that subj's dir.</li><li><a href="timevp_extract_pairs.html" class="code" title="function [allpairs, events1_wo, events2_wo] = timevp_extract_pairs(filename1, filename2, timing_relation, savefilename, mapping, args)">timevp_extract_pairs</a>	Extracts pairs of events that fit a specified temporal condition</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [allpairs, events1_wo, events2_wo] = timevp_extract_pairs_by_subject(subject_list, variable1, variable2, timing_relation, dir_savefiles, mapping, args)</a>
+0002 <span class="comment">% Extracts pairs of events for a specific subject that fit a specified temporal condition</span>
+0003 NUM_DEFAULT = 150;
+0004 
+0005 <span class="keyword">if</span> ~exist(<span class="string">'mapping'</span>, <span class="string">'var'</span>) || isempty(mapping)
+0006     mapping = [(1:NUM_DEFAULT)' (1:NUM_DEFAULT)'];
+0007 <span class="keyword">end</span>
+0008 
+0009 <span class="keyword">if</span> ~exist(<span class="string">'args'</span>, <span class="string">'var'</span>) || isempty(args)
+0010     args = struct();
+0011 <span class="keyword">end</span>
+0012 
+0013 num_subs = length(subject_list);
+0014 allpairs = cell(num_subs, 1);
+0015 events1_wo = cell(num_subs, 1);
+0016 events2_wo = cell(num_subs, 1);
+0017 
+0018 <span class="keyword">for</span> sidx = 1:num_subs
+0019     sub_id = subject_list(sidx);
+0020     
+0021     <span class="keyword">if</span> <a href="has_variable.html" class="code" title="function has_it = has_variable(subject_id, var_name)">has_variable</a>(sub_id, variable1)
+0022         file_var1 = <a href="get_variable_file_path.html" class="code" title="function variable_file = get_variable_file_path(sub_id, var_name)">get_variable_file_path</a>(sub_id, variable1);
+0023     <span class="keyword">else</span>
+0024         warning(<span class="string">'Subject %d does not have variable %s.'</span>, sub_id, variable1);
+0025         <span class="keyword">continue</span>
+0026     <span class="keyword">end</span>
+0027     
+0028     <span class="keyword">if</span> <a href="has_variable.html" class="code" title="function has_it = has_variable(subject_id, var_name)">has_variable</a>(sub_id, variable2)
+0029         file_var2 = <a href="get_variable_file_path.html" class="code" title="function variable_file = get_variable_file_path(sub_id, var_name)">get_variable_file_path</a>(sub_id, variable2);
+0030     <span class="keyword">else</span>
+0031         warning(<span class="string">'Subject %d does not have variable %s.'</span>, sub_id, variable2);
+0032         <span class="keyword">continue</span>
+0033     <span class="keyword">end</span>
+0034     
+0035     file_savename = fullfile(dir_savefiles, sprintf(<span class="string">'extract_pairs_%s_%s_%d.csv'</span>,variable1, variable2, sub_id));
+0036     
+0037     [pairs_sub, events1_sub, events2_sub] = <a href="timevp_extract_pairs.html" class="code" title="function [allpairs, events1_wo, events2_wo] = timevp_extract_pairs(filename1, filename2, timing_relation, savefilename, mapping, args)">timevp_extract_pairs</a>(file_var1, file_var2, timing_relation, file_savename, mapping, args);
+0038     
+0039     allpairs{sidx} = pairs_sub;
+0040     events1_wo{sidx} = events1_sub;
+0041     events2_wo{sidx} = events2_sub;
+0042 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

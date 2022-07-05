@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of timevp_compute_statistics</title>
+  <meta name="keywords" content="timevp_compute_statistics">
+  <meta name="description" content="Computes event distribution statistics of provided time series data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; timevp_compute_statistics.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>timevp_compute_statistics
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Computes event distribution statistics of provided time series data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function result_stats = timevp_compute_statistics(variable_name, subject_list, args) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Computes event distribution statistics of provided time series data</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="event_cal_stats.html" class="code" title="function results = event_cal_stats(chunks, args)">event_cal_stats</a>	Report various stypes of statistics of event data</li><li><a href="get_data_by_subject.html" class="code" title="function [data, extra_info] = get_data_by_subject(subject_list, var_name, args)">get_data_by_subject</a>	This function fetches data by subject ID and variable name</li><li><a href="stream2event.html" class="code" title="function result = stream2event(stream, sample_rate, include_zero)">stream2event</a>	Convert stream data to cevent data</li><li><a href="stream_cal_stats.html" class="code" title="function results = stream_cal_stats(chunks, args)">stream_cal_stats</a>	Report various stypes of statistics of stream type data</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function result_stats = timevp_compute_statistics(variable_name, subject_list, args)</a>
+0002 <span class="comment">% Computes event distribution statistics of provided time series data</span>
+0003 <span class="keyword">if</span> nargin &lt; 3
+0004     args = struct();
+0005 <span class="keyword">end</span>
+0006     
+0007 num_subs = length(subject_list);
+0008 is_event = false;
+0009 
+0010 [chunks, extra_info] = <a href="get_data_by_subject.html" class="code" title="function [data, extra_info] = get_data_by_subject(subject_list, var_name, args)">get_data_by_subject</a>(subject_list, variable_name, args);
+0011 num_cols_data = extra_info.num_cols_data;
+0012 
+0013 <span class="keyword">if</span> length(num_cols_data) &gt; 1
+0014     warning([<span class="string">'There are both stream and event type data in the put. Function will '</span><span class="keyword">...</span>
+0015         <span class="string">'now transform all stream data into event type data.'</span>]);
+0016     
+0017     <span class="keyword">if</span> isfield(args, <span class="string">'sample_rate'</span>)
+0018         sample_rate = args.sample_rate;
+0019     <span class="keyword">else</span>
+0020         sample_rate = timevp_config_dataset_info();
+0021     <span class="keyword">end</span>
+0022 
+0023     <span class="keyword">for</span> cidx = 1:num_subs
+0024         data_one = chunks{cidx};
+0025         chunks{cidx} = <a href="stream2event.html" class="code" title="function result = stream2event(stream, sample_rate, include_zero)">stream2event</a>(data_one, sample_rate);
+0026     <span class="keyword">end</span>
+0027     
+0028     is_event = true;
+0029 <span class="keyword">elseif</span> num_cols_data == 3
+0030     is_event = true;
+0031 <span class="keyword">end</span>
+0032 
+0033 <span class="keyword">if</span> isfield(extra_info, <span class="string">'ranges'</span>)
+0034     ranges = extra_info.ranges;
+0035     individual_range_dur = nan(num_subs, 1);
+0036     <span class="keyword">for</span> sidx = 1:num_subs
+0037         range_one = ranges{sidx};
+0038         individual_range_dur(sidx, 1) = sum(range_one(:,2) - range_one(:,1));
+0039     <span class="keyword">end</span>
+0040     args.individual_range_dur = individual_range_dur;
+0041 <span class="keyword">end</span>
+0042 
+0043 args.subject_list = subject_list;
+0044 
+0045 <span class="keyword">if</span> is_event
+0046     result_stats = <a href="event_cal_stats.html" class="code" title="function results = event_cal_stats(chunks, args)">event_cal_stats</a>(chunks, args);
+0047 <span class="keyword">else</span>
+0048     result_stats = <a href="stream_cal_stats.html" class="code" title="function results = stream_cal_stats(chunks, args)">stream_cal_stats</a>(chunks, args);
+0049 <span class="keyword">end</span>
+0050 
+0051 result_stats.data_list = chunks;</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

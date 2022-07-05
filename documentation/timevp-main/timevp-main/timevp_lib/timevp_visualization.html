@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of timevp_visualization</title>
+  <meta name="keywords" content="timevp_visualization">
+  <meta name="description" content="Display window for visualizing time series data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; timevp_visualization.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>timevp_visualization
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Display window for visualizing time series data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function timevp_visualization(csvfile_list, vis_args) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Display window for visualizing time series data</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="csv2stream.html" class="code" title="function stream = csv2stream(csv_filename)">csv2stream</a>	This function reads data from a csv file and converts the data into time</li><li><a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>	Extract chunks from data, delegating based on data type</li><li><a href="visualize_streams.html" class="code" title="function visualize_streams(data, args, cont_data, cont_args)">visualize_streams</a>	Plotting function for visualizing temporal pattens</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function timevp_visualization(csvfile_list, vis_args)</a>
+0002 <span class="comment">% Display window for visualizing time series data</span>
+0003 <span class="keyword">if</span> isfield(vis_args, <span class="string">'windows'</span>)
+0004     windows = vis_args.windows;
+0005     is_multi_rows = true;
+0006     num_windows = size(windows, 1);
+0007     vis_args.ForceZero = true;
+0008     vis_args.time_ref = windows(:,1);
+0009     
+0010     windows_dur = windows(:,2) - windows(:,1);
+0011     dur_min = min(windows_dur);
+0012     dur_max = max(windows_dur);
+0013     <span class="keyword">if</span> abs(dur_max - dur_min) &gt; 10
+0014         warning(<span class="string">'The window sizes are different from each other, so there will be blank space in the visualization.'</span>);
+0015     <span class="keyword">end</span>
+0016 <span class="keyword">else</span>
+0017     windows = [];
+0018     is_multi_rows = false;
+0019     num_windows = 1;
+0020 <span class="keyword">end</span>
+0021 
+0022 <span class="comment">% visualize streams by csv data</span>
+0023 num_files = length(csvfile_list);
+0024 plot_data = cell(num_windows, num_files);
+0025 
+0026 <span class="keyword">for</span> fidx = 1:num_files
+0027     file_one = csvfile_list{fidx};
+0028     data_one = <a href="csv2stream.html" class="code" title="function stream = csv2stream(csv_filename)">csv2stream</a>(file_one);
+0029 
+0030     <span class="keyword">if</span> is_multi_rows
+0031         extracted_data = <a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>(data_one, windows);
+0032         <span class="keyword">if</span> ~isempty(extracted_data)
+0033             plot_data(:, fidx) = extracted_data';
+0034         <span class="keyword">end</span>
+0035     <span class="keyword">else</span>
+0036         plot_data{1, fidx} = data_one;
+0037     <span class="keyword">end</span>
+0038 <span class="keyword">end</span>
+0039 <a href="visualize_streams.html" class="code" title="function visualize_streams(data, args, cont_data, cont_args)">visualize_streams</a>(plot_data, vis_args);
+0040 
+0041 
+0042</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

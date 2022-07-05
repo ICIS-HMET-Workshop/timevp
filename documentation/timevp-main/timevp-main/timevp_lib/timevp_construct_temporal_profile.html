@@ -1,0 +1,430 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of timevp_construct_temporal_profile</title>
+  <meta name="keywords" content="timevp_construct_temporal_profile">
+  <meta name="description" content="Generates temporal profile of a group of continue variables">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; timevp_construct_temporal_profile.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>timevp_construct_temporal_profile
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Generates temporal profile of a group of continue variables</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [profile_data] = timevp_construct_temporal_profile(input) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Generates temporal profile of a group of continue variables
+ or one cstream profile chunked by one cevent variable.
+
+ For detailed user guide one this function, please go to demo script at:
+ 
+ 
+ Last update by Linger, txu@indiana.edu on 07/21/2016</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="event2stream.html" class="code" title="function stream = event2stream(events, sample_rate, default_value, start_time, end_time)">event2stream</a>	Generate stream from events</li><li><a href="event_relative_intervals.html" class="code" title="function relative_intervals = event_relative_intervals(event, whence, interval)">event_relative_intervals</a>	Find time relative to start or end of events</li><li><a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>	Extract chunks from data, delegating based on data type</li><li><a href="get_data_by_subject.html" class="code" title="function [data, extra_info] = get_data_by_subject(subject_list, var_name, args)">get_data_by_subject</a>	This function fetches data by subject ID and variable name</li><li><a href="get_event_opposite.html" class="code" title="function events_out = get_event_opposite(event_data, ranges, sub_id)">get_event_opposite</a>	This function get the durations that are not within the event ranges but</li><li><a href="get_variable_data.html" class="code" title="function data = get_variable_data(subject_id, variable_name)">get_variable_data</a>	Return subject_id and variable_name of variable</li><li><a href="has_variable.html" class="code" title="function has_it = has_variable(subject_id, var_name)">has_variable</a>	Returns true if the variable file exists in that subj's dir.</li><li><a href="stream2event.html" class="code" title="function result = stream2event(stream, sample_rate, include_zero)">stream2event</a>	Convert stream data to cevent data</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [profile_data] = timevp_construct_temporal_profile(input)</a>
+0002 <span class="comment">% Generates temporal profile of a group of continue variables</span>
+0003 <span class="comment">% or one cstream profile chunked by one cevent variable.</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% For detailed user guide one this function, please go to demo script at:</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% Last update by Linger, txu@indiana.edu on 07/21/2016</span>
+0009 
+0010 float_tolerance = 1e-12;
+0011 
+0012 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0013 sub_list = input.sub_list;
+0014 
+0015 <span class="keyword">if</span> ~(isfield(input, <span class="string">'whence'</span>) &amp;&amp; isfield(input, <span class="string">'interval'</span>))
+0016     error([<span class="string">'Error. This functions only works ''whence'' and ''interval'' are both specified. '</span> <span class="keyword">...</span>
+0017         <span class="string">'For example, one wants to generate gaze profile 10 seconds before to the onset of '</span> <span class="keyword">...</span>
+0018         <span class="string">'naming instances. In this case, whence is ''start'', interval is [-10 0].'</span>]);
+0019 <span class="keyword">else</span>
+0020     whence = input.whence;
+0021     interval = input.interval;
+0022 <span class="keyword">end</span>
+0023 
+0024 <span class="keyword">if</span> ~isfield(input, <span class="string">'event_category'</span>)
+0025     error([<span class="string">'When data are regrouped by events, the field '</span> <span class="keyword">...</span>
+0026         <span class="string">'EVENT_CATEGORY must be specified.'</span>]);
+0027 <span class="keyword">else</span>
+0028     event_category = input.event_category;
+0029 <span class="keyword">end</span>
+0030 <span class="keyword">if</span> ~isfield(input, <span class="string">'var_category'</span>)
+0031     error([<span class="string">'Under all situations, the field '</span> <span class="keyword">...</span>
+0032         <span class="string">'VAR_CATEGORY must be specified.'</span>]);
+0033 <span class="keyword">else</span>
+0034     var_category = input.var_category;
+0035 <span class="keyword">end</span>
+0036 
+0037 <span class="keyword">if</span> isfield(input, <span class="string">'sample_rate'</span>)
+0038     sample_rate = input.sample_rate;
+0039 <span class="keyword">else</span>
+0040     sample_rate = timevp_config_dataset_info();
+0041 <span class="keyword">end</span>
+0042 
+0043 <span class="comment">% if strcmp(whence, 'start')</span>
+0044 <span class="comment">%     ref_column = 1;</span>
+0045 <span class="comment">%     str_align = 'onset';</span>
+0046 <span class="comment">% elseif strcmp(whence, 'end')</span>
+0047 <span class="comment">%     ref_column = 2;</span>
+0048 <span class="comment">%     str_align = 'offset';</span>
+0049 <span class="comment">% end</span>
+0050 
+0051 segment_event = input.segment_event;
+0052 var_name = input.var_name;
+0053 
+0054 <span class="comment">% check if variable exists for all subjects</span>
+0055 x_has_var_event = arrayfun( <span class="keyword">...</span>
+0056     @(sub_id) <span class="keyword">...</span>
+0057     <a href="has_variable.html" class="code" title="function has_it = has_variable(subject_id, var_name)">has_variable</a>(sub_id, segment_event), <span class="keyword">...</span>
+0058     sub_list, <span class="keyword">...</span>
+0059     <span class="string">'UniformOutput'</span>, 0);
+0060 x_has_var_event = vertcat(x_has_var_event{:});
+0061 
+0062 <span class="keyword">if</span> sum(~x_has_var_event) &gt; 0
+0063     missvar_sub_list = num2str(sub_list(~x_has_var_event)');
+0064     fprintf(<span class="string">'Variable %s does not exist for subject(s) %s\n'</span>, segment_event, missvar_sub_list);
+0065 <span class="keyword">end</span>
+0066 mask_has_variable = x_has_var_event;
+0067 
+0068 groupid_matrix = input.groupid_matrix;
+0069 groupid_list = unique(groupid_matrix);
+0070 num_groupids = length(groupid_list);
+0071 
+0072 <span class="keyword">if</span> iscell(input.var_name)
+0073     example_var_name = var_name{1};
+0074     is_var_cell = true;
+0075     num_vars = length(var_name);
+0076     
+0077     <span class="keyword">if</span> size(groupid_matrix, 1) ~= num_vars
+0078         error([<span class="string">'In ''groupid_matrix'', each row corresponding to a cstream ROI value or the order of cont type '</span> <span class="keyword">...</span>
+0079             <span class="string">'variable, and each column corresponding to a event value. So, if you input a cell list of '</span> <span class="keyword">...</span>
+0080             <span class="string">'cont variables in the grouping variable list, the number and order of the variables '</span> <span class="keyword">...</span>
+0081             <span class="string">'should match with the rows in groupid_matrix.'</span>]);
+0082     <span class="keyword">end</span>
+0083     
+0084     <span class="keyword">for</span> vidx = 1:num_vars
+0085         x_var_one = arrayfun( <span class="keyword">...</span>
+0086             @(sub_id) <span class="keyword">...</span>
+0087             <a href="has_variable.html" class="code" title="function has_it = has_variable(subject_id, var_name)">has_variable</a>(sub_id, var_name{vidx}), <span class="keyword">...</span>
+0088             sub_list, <span class="keyword">...</span>
+0089             <span class="string">'UniformOutput'</span>, 0);
+0090         x_var_one = vertcat(x_var_one{:});
+0091 
+0092         <span class="keyword">if</span> sum(~x_var_one) &gt; 0
+0093             missvar_sub_list = num2str(sub_list(~x_var_one)');
+0094             fprintf(<span class="string">'Variable %s does not exist for subject(s) %s\n'</span>, var_name{vidx}, missvar_sub_list);
+0095         <span class="keyword">end</span>
+0096         mask_has_variable = mask_has_variable &amp; x_var_one;
+0097     <span class="keyword">end</span>
+0098 <span class="keyword">else</span>
+0099     example_var_name = var_name;
+0100     is_var_cell = false; <span class="comment">% meaning the input variable only has one cstream</span>
+0101     num_vars = 1;
+0102 
+0103     x_var_one = arrayfun( <span class="keyword">...</span>
+0104         @(sub_id) <span class="keyword">...</span>
+0105         <a href="has_variable.html" class="code" title="function has_it = has_variable(subject_id, var_name)">has_variable</a>(sub_id, var_name), <span class="keyword">...</span>
+0106         sub_list, <span class="keyword">...</span>
+0107         <span class="string">'UniformOutput'</span>, 0);
+0108     x_var_one = vertcat(x_var_one{:});
+0109 
+0110     <span class="keyword">if</span> sum(~x_var_one) &gt; 0
+0111         missvar_sub_list = num2str(sub_list(~x_var_one)');
+0112         fprintf(<span class="string">'Variable %s does not exist for subject(s) %s\n'</span>, var_name, missvar_sub_list);
+0113     <span class="keyword">end</span>
+0114     mask_has_variable = mask_has_variable &amp; x_var_one;
+0115 <span class="keyword">end</span>
+0116 
+0117 <span class="keyword">if</span> size(groupid_matrix, 1) ~= length(var_category)
+0118     error([<span class="string">'In ''groupid_matrix'', each row corresponding to a cstream ROI value or the order of cont type '</span> <span class="keyword">...</span>
+0119         <span class="string">'variables, and each column corresponding to a event value. So, the number of values in '</span> <span class="keyword">...</span>
+0120         <span class="string">'''var_category'' should match with the number of rows in groupid_matrix.'</span>]);
+0121 <span class="keyword">end</span>
+0122 
+0123 <span class="keyword">if</span> size(groupid_matrix, 2) ~= length(event_category)
+0124     error([<span class="string">'In ''groupid_matrix'', each row corresponding to a cstream value/variable, and '</span> <span class="keyword">...</span>
+0125         <span class="string">'each column corresponding to a event value. So, the number of values in '</span> <span class="keyword">...</span>
+0126         <span class="string">'''event_category'' should match with the number of columns in groupid_matrix.'</span>]);
+0127 <span class="keyword">end</span>
+0128 
+0129 sub_list = sub_list(mask_has_variable);
+0130 
+0131 <span class="comment">% Initialize result</span>
+0132 result_chunks = cell(length(sub_list), num_groupids);
+0133 result_sub_list = cell(length(sub_list), 1);
+0134 result_ranges = cell(length(sub_list), 1);
+0135 result_events = cell(length(sub_list), 1);
+0136 result_event_index = cell(length(sub_list), 1);
+0137 result_probs_mean = cell(length(sub_list), 1);
+0138 
+0139 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0140 <span class="keyword">for</span> sidx = 1:length(sub_list)
+0141     sub_id = sub_list(sidx);
+0142     
+0143     <span class="keyword">if</span> is_var_cell
+0144         var_data = cell(1, num_vars);
+0145         
+0146         <span class="keyword">for</span> vidx = 1:num_vars
+0147             data_one = <a href="get_variable_data.html" class="code" title="function data = get_variable_data(subject_id, variable_name)">get_variable_data</a>(sub_id, var_name{vidx});
+0148             <span class="keyword">if</span> size(data_one, 2) == 3
+0149                 warning(<span class="string">'Variable %s is in event data format, convert to streams.'</span>, var_name{vidx});
+0150                 data_one = <a href="event2stream.html" class="code" title="function stream = event2stream(events, sample_rate, default_value, start_time, end_time)">event2stream</a>(data_one);
+0151             <span class="keyword">end</span>
+0152             
+0153             var_data{vidx} = data_one;
+0154         <span class="keyword">end</span>
+0155     <span class="keyword">else</span>
+0156         var_data = <a href="get_variable_data.html" class="code" title="function data = get_variable_data(subject_id, variable_name)">get_variable_data</a>(sub_id, var_name);
+0157         warning(<span class="string">'Variable %s is in event data format, convert to streams.'</span>, var_name);
+0158         var_data = <a href="event2stream.html" class="code" title="function stream = event2stream(events, sample_rate, default_value, start_time, end_time)">event2stream</a>(var_data);
+0159     <span class="keyword">end</span>
+0160 
+0161     time_base = interval(1):sample_rate:(interval(2)-+0.0001);
+0162     length_profile = length(time_base);
+0163     duration_profile = interval(2) - interval(1);
+0164     time_base_ts = 0:sample_rate:(duration_profile-0.0001);
+0165 
+0166     event_data = <a href="get_data_by_subject.html" class="code" title="function [data, extra_info] = get_data_by_subject(subject_list, var_name, args)">get_data_by_subject</a>(sub_id, segment_event);
+0167     num_events = size(event_data, 1);
+0168     
+0169     <span class="keyword">if</span> size(event_data, 2) == 2
+0170         warning(<span class="string">'Segment event variable %s is in stream data format, convert to events.'</span>, segment_event);
+0171         event_data = <a href="stream2event.html" class="code" title="function result = stream2event(stream, sample_rate, include_zero)">stream2event</a>(event_data, sample_rate);
+0172     <span class="keyword">end</span>
+0173 
+0174     <span class="keyword">if</span> isfield(input, <span class="string">'event_min_dur'</span>)
+0175         event_dur = event_data(:,2) - event_data(:,1); 
+0176         x_dur_mask = event_dur &gt;= input.event_min_dur;
+0177         event_data = event_data(x_dur_mask, :);
+0178     <span class="keyword">end</span>
+0179 
+0180     <span class="keyword">if</span> isfield(input, <span class="string">'event_max_dur'</span>)
+0181         event_dur = event_data(:,2) - event_data(:,1); 
+0182         x_dur_mask = event_dur &lt;= input.event_max_dur;
+0183         event_data = event_data(x_dur_mask, :);
+0184     <span class="keyword">end</span>
+0185 
+0186     <span class="keyword">if</span> isempty(event_data)
+0187         fprintf(<span class="string">'Subject %d has zero instances of %s that met criteria.\n'</span>, sub_id, segment_event);
+0188         <span class="keyword">continue</span>
+0189     <span class="keyword">end</span>
+0190 
+0191     <span class="comment">% After retrieving event data, start getting cont/cstream</span>
+0192     <span class="comment">% variables</span>
+0193     result_sub_list{sidx, 1} = repmat(sub_id, num_events, 1);
+0194     result_events{sidx, 1} = event_data;
+0195     result_event_index{sidx, 1} = (1:num_events)'; 
+0196     probs_mean_sub = nan(num_events, num_groupids);
+0197 
+0198     temporal_ranges = <a href="event_relative_intervals.html" class="code" title="function relative_intervals = event_relative_intervals(event, whence, interval)">event_relative_intervals</a>(<span class="keyword">...</span>
+0199         event_data, input.whence, input.interval);
+0200 
+0201     <span class="keyword">if</span> isfield(input, <span class="string">'within_ranges'</span>) &amp;&amp; ~input.within_ranges
+0202         temporal_ranges = <a href="get_event_opposite.html" class="code" title="function events_out = get_event_opposite(event_data, ranges, sub_id)">get_event_opposite</a>(sub_id, event_data, trials_one);
+0203     <span class="keyword">end</span>
+0204 
+0205     result_ranges{sidx, 1} = temporal_ranges;
+0206 
+0207     chunks_profile_sub = cell(1, num_groupids);
+0208     <span class="keyword">for</span> coidx = 1:num_groupids
+0209         chunks_profile_sub{coidx} = nan(num_events, length_profile);
+0210     <span class="keyword">end</span>
+0211 
+0212     <span class="comment">% when user input a list of continue variables</span>
+0213     <span class="keyword">if</span> is_var_cell
+0214         <span class="comment">% chunks_var_origin stores the variable extracted from the dataset</span>
+0215         chunks_var_origin = cell(num_events, num_vars);
+0216         mat_var_profile = nan(num_events, length_profile, num_vars);
+0217         cont_sum_sub = zeros(num_events, length_profile, num_groupids);
+0218         cont_count_sub = zeros(num_events, length_profile, num_groupids);
+0219         
+0220         <span class="comment">% fetch and format continue variable data</span>
+0221         <span class="keyword">for</span> vidx = 1:num_vars
+0222             chunks_var_one  = <a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>(var_data{vidx}, <span class="keyword">...</span>
+0223                 str_var_type, {temporal_ranges});
+0224             mat_profile_one = nan(num_events, length_profile);
+0225             
+0226             <span class="keyword">for</span> cnidx = 1:num_events
+0227                 range_one = temporal_ranges(cnidx, :);
+0228 
+0229                 chunks_one_new = chunks_var_one{cnidx};
+0230                 chunks_one_new(:, 1) = chunks_one_new(:, 1) - range_one(1);
+0231                 length_one = size(chunks_one_new, 1);
+0232 
+0233                 <span class="keyword">if</span> length_one &lt; length_profile
+0234                     chunk_ts = timeseries(chunks_one_new(:, 2:end), chunks_one_new(:, 1));
+0235                     chunk_ts = resample(chunk_ts, time_base_ts, <span class="string">'zoh'</span>);
+0236                     chunks_one_new = horzcat(get(chunk_ts, <span class="string">'Time'</span>), get(chunk_ts, <span class="string">'Data'</span>));
+0237                 <span class="keyword">end</span>
+0238 
+0239                 chunks_one_new(isnan(chunks_one_new(:,2)),2) = 0;
+0240                 mat_profile_one(cnidx, :) = chunks_one_new(:, 2)';
+0241             <span class="keyword">end</span>
+0242             
+0243             mat_var_profile(:, :, vidx) = mat_profile_one;
+0244         <span class="keyword">end</span>
+0245         
+0246         <span class="keyword">for</span> eventidx = 1 : length(event_category)
+0247             event_values = event_category(eventidx);
+0248             label_column = groupid_matrix(:, eventidx);
+0249             label_column_list = unique(label_column);
+0250 
+0251             mask_cvalues = ismember(event_data(:, 3), event_values);
+0252 <span class="comment">%             chunks_var_by_cvalue = chunks_var_origin(mask_cvalues);</span>
+0253 <span class="comment">%             chunks_ranges = temporal_ranges(mask_cvalues);</span>
+0254 <span class="comment">%             num_events_value = sum(mask_cvalues);</span>
+0255             
+0256             <span class="keyword">for</span> lidx = 1:length(label_column_list)
+0257                 label_one = label_column_list(lidx);
+0258                 target_categories = var_category(label_column == label_one);
+0259                 
+0260                 tmp_profile = cont_sum_sub(mask_cvalues, :, label_one);
+0261                 tmp_count = cont_count_sub(mask_cvalues, :, label_one);
+0262                 cont_sum_sub(mask_cvalues, :, label_one) = <span class="keyword">...</span>
+0263                     cont_sum_sub(mask_cvalues, :, label_one) + <span class="keyword">...</span>
+0264                     sum(mat_var_profile(mask_cvalues, :, target_categories), 3);
+0265                 cont_count_sub(mask_cvalues, :, label_one) = <span class="keyword">...</span>
+0266                     cont_count_sub(mask_cvalues, :, label_one) + <span class="keyword">...</span>
+0267                     sum(mat_var_profile(mask_cvalues, :, target_categories)&gt;0, 3);
+0268             <span class="keyword">end</span>
+0269         <span class="keyword">end</span> <span class="comment">% end of going through all events</span>
+0270         
+0271         <span class="keyword">for</span> gidx = 1:num_groupids
+0272             label_one = groupid_list(gidx);
+0273             tmp_count = cont_count_sub(:, :, gidx);
+0274             probs_mean_sub(:, gidx) = sum(cont_sum_sub(:, :, gidx), 2) ./ sum(tmp_count, 2);
+0275             tmp_count(tmp_count &lt; 1) = 1;
+0276             chunks_profile_sub{gidx} = cont_sum_sub(:, :, gidx) ./ tmp_count;
+0277         <span class="keyword">end</span>
+0278     <span class="comment">% when user input is not a cell of variables</span>
+0279     <span class="keyword">else</span>
+0280         <span class="comment">% chunks_var_origin stores the variable extracted from the dataset</span>
+0281         chunks_var_origin = <a href="extract_ranges.html" class="code" title="function [all_chunks, extracted_info] = extract_ranges(all_data, all_ranges, args)">extract_ranges</a>(var_data, {temporal_ranges});
+0282         
+0283         <span class="comment">% chunks_var_mat stores the variables that were reassigned</span>
+0284         chunks_var_mat = nan(num_events, length_profile);
+0285         chunks_check_mat = nan(num_events, length_profile);
+0286 
+0287         <span class="keyword">for</span> eventidx = 1 : length(event_category)
+0288             event_values = event_category(eventidx);
+0289             label_column = groupid_matrix(:, eventidx);
+0290             label_column_list = unique(label_column);
+0291 
+0292             mask_cvalues = ismember(event_data(:, 3), event_values);
+0293             chunks_var_by_cvalue = chunks_var_origin(mask_cvalues);
+0294             chunks_ranges = temporal_ranges(mask_cvalues);
+0295             num_events_value = sum(mask_cvalues);
+0296 
+0297             mat_var_profile = nan(num_events_value, length_profile);
+0298 
+0299             <span class="keyword">for</span> cnidx = 1:size(chunks_ranges, 1)
+0300                 range_one = chunks_ranges(cnidx, :);
+0301 
+0302                 chunks_one_new = chunks_var_by_cvalue{cnidx};
+0303                 chunks_one_new(:, 1) = chunks_one_new(:, 1) - range_one(1);
+0304                 length_one = size(chunks_one_new, 1);
+0305 
+0306                 <span class="keyword">if</span> length_one &lt; length_profile
+0307                     chunk_ts = timeseries(chunks_one_new(:, 2:end), chunks_one_new(:, 1));
+0308                     chunk_ts = resample(chunk_ts, time_base_ts, <span class="string">'zoh'</span>);
+0309                     chunks_one_new = horzcat(get(chunk_ts, <span class="string">'Time'</span>), get(chunk_ts, <span class="string">'Data'</span>));
+0310                 <span class="keyword">end</span>
+0311 
+0312                 mat_var_profile(cnidx, :) = chunks_one_new(:, 2)';
+0313             <span class="keyword">end</span>
+0314 
+0315             mat_origin_profile = mat_var_profile;
+0316             <span class="keyword">for</span> lidx = 1:length(label_column_list)
+0317                 label_one = label_column_list(lidx);
+0318                 target_categories = var_category(label_column == label_one);
+0319 
+0320                 mask_reassign = ismember(mat_origin_profile, target_categories);
+0321                 mat_var_profile(mask_reassign) = label_one;
+0322             <span class="keyword">end</span>
+0323 
+0324             chunks_check_mat(mask_cvalues, :) = mat_origin_profile;
+0325             chunks_var_mat(mask_cvalues, :) = mat_var_profile;
+0326         <span class="keyword">end</span> <span class="comment">% end of going through event categorical values</span>
+0327 
+0328         <span class="keyword">for</span> gidx = 1 : num_groupids
+0329             label_target = groupid_list(gidx);
+0330             label_other = setdiff(groupid_list, label_target);
+0331 
+0332             <span class="comment">% Each cell contains the matrix that holds data for one group label</span>
+0333             tmp_chunk = chunks_profile_sub{gidx};
+0334 
+0335             mask_group = ismember(chunks_var_mat, label_target);
+0336             tmp_chunk(mask_group) = 1;
+0337             mask_other = ismember(chunks_var_mat, label_other);
+0338             tmp_chunk(mask_other) = 0;
+0339             mask_zeros = chunks_var_mat &lt; 1;
+0340             tmp_chunk(mask_zeros) = 0;
+0341             chunks_profile_sub{gidx} = tmp_chunk;
+0342 
+0343             num_valid_data = sum(~isnan(tmp_chunk), 2);
+0344             num_matches = sum(mask_group, 2);
+0345             probs_mean_sub(:, gidx) = num_matches ./ num_valid_data;
+0346         <span class="keyword">end</span>
+0347     <span class="keyword">end</span>
+0348     
+0349     result_chunks(sidx, :) = chunks_profile_sub;
+0350     result_probs_mean{sidx, :} = probs_mean_sub;
+0351 <span class="keyword">end</span> <span class="comment">% end of sidx</span>
+0352  
+0353 <span class="comment">% result_chunks = vertcat(result_chunks{:});</span>
+0354 result_probs_mean = vertcat(result_probs_mean{:});
+0355 
+0356 <span class="comment">% subID    expID    onset    offset    category    instanceID</span>
+0357 profile_data.sub_list = vertcat(result_sub_list{:});
+0358 profile_data.events = vertcat(result_events{:});
+0359 profile_data.event_instanceid = vertcat(result_event_index{:});
+0360 profile_data.probs_mean_per_instance = result_probs_mean;
+0361 
+0362 <span class="keyword">if</span> isfield(input, <span class="string">'groupid_label'</span>)
+0363     profile_data.groupid_label = input.groupid_label;
+0364 <span class="keyword">else</span>
+0365     profile_data.groupid_label = {<span class="string">'target'</span>, <span class="string">'non-target'</span>, <span class="string">'other'</span>};
+0366     profile_data.groupid_label = profile_data.groupid_label(groupid_list);
+0367 <span class="keyword">end</span>
+0368 profile_data.group_list = groupid_list';
+0369 profile_data_mat = cell(1, num_groupids);
+0370 <span class="keyword">for</span> gidx = 1:num_groupids
+0371     profile_data_mat{gidx} = vertcat(result_chunks{:, gidx});
+0372 <span class="keyword">end</span>
+0373 profile_data.profile_data_mat = profile_data_mat;
+0374 profile_data.sample_rate = sample_rate;
+0375 profile_data.time_base = time_base;
+0376 profile_data.segment_event = segment_event;
+0377 profile_data.variable_name = var_name;</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

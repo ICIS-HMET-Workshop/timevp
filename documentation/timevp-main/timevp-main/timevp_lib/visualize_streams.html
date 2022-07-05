@@ -1,0 +1,795 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of visualize_streams</title>
+  <meta name="keywords" content="visualize_streams">
+  <meta name="description" content="Plotting function for visualizing temporal pattens">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; visualize_streams.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>visualize_streams
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Plotting function for visualizing temporal pattens</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function visualize_streams(data, args, cont_data, cont_args) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Plotting function for visualizing temporal pattens
+ For input format, please see the function get_test_data() below
+ 
+ Example:
+ &gt;&gt;&gt;  args.legend = {'Event1'; 'Event2'; 'Event3'; 'Event4'};
+ &gt;&gt;&gt;  plot_temp_patterns({}, 1, args)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="check_data_empty.html" class="code" title="function is_empty = check_data_empty(data, flag_allow_empty_cell)">check_data_empty</a>	Checks if the provided data is empty</li><li><a href="get_colormap.html" class="code" title="function colormap = get_colormap(n, is_plot_colormap)">get_colormap</a>	Makes and saves a colormap from provided data</li><li><a href="stream2event.html" class="code" title="function result = stream2event(stream, sample_rate, include_zero)">stream2event</a>	Convert stream data to cevent data</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="timevp_visualization.html" class="code" title="function timevp_visualization(csvfile_list, vis_args)">timevp_visualization</a>	Display window for visualizing time series data</li><li><a href="timevp_visualization_by_subject_variable.html" class="code" title="function timevp_visualization_by_subject_variable(subject_list, variable_list, vis_args)">timevp_visualization_by_subject_variable</a>	Visualization for time series data</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function color = get_color(k, k_base, colormap)</a></li><li><a href="#_sub2" class="code">function [x, y] = create_square(x1, x2, y1, cidx, color, args)</a></li><li><a href="#_sub3" class="code">function ln = create_line(vec, row, time_ref, color, args)</a></li><li><a href="#_sub4" class="code">function ret = get_test_data()</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function visualize_streams(data, args, cont_data, cont_args)</a>
+0002 <span class="comment">% Plotting function for visualizing temporal pattens</span>
+0003 <span class="comment">% For input format, please see the function get_test_data() below</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Example:</span>
+0006 <span class="comment">% &gt;&gt;&gt;  args.legend = {'Event1'; 'Event2'; 'Event3'; 'Event4'};</span>
+0007 <span class="comment">% &gt;&gt;&gt;  plot_temp_patterns({}, 1, args)</span>
+0008 
+0009 <span class="comment">% add other vs target</span>
+0010 
+0011 <span class="comment">% debugging:</span>
+0012 <span class="comment">% visualize_cevent_patterns(data, args)</span>
+0013 
+0014 LENGTH_CEVENT = 3;
+0015 
+0016 figure_bgcolor = [1 1 1];
+0017 text_bgcolor = figure_bgcolor;
+0018 <span class="keyword">if</span> isfield(args, <span class="string">'row_text'</span>)
+0019     row_text = args.row_text;
+0020 <span class="keyword">else</span>
+0021     row_text = [];
+0022 <span class="keyword">end</span>
+0023 
+0024 <span class="comment">% if isfield(args, 'text_offset')</span>
+0025 <span class="comment">%     text_offset = args.text_offset;</span>
+0026 <span class="comment">% else</span>
+0027 <span class="comment">%     text_offset = -0.1;</span>
+0028 <span class="comment">% end</span>
+0029 
+0030 is_data_empty = <a href="check_data_empty.html" class="code" title="function is_empty = check_data_empty(data, flag_allow_empty_cell)">check_data_empty</a>(data);
+0031 
+0032 <span class="keyword">if</span> is_data_empty
+0033     warning(<span class="string">'Input data is empty. Function visualize_streams() will exist now.'</span>)
+0034     <span class="keyword">return</span>;
+0035 <span class="comment">%     data = get_test_data();</span>
+0036 <span class="keyword">end</span>
+0037 
+0038 num_rows = size(data, 1);
+0039 <span class="keyword">if</span> num_rows &gt; 2 <span class="comment">% there are multiple trials</span>
+0040     is_multi_rows = true;
+0041 <span class="keyword">else</span>
+0042     is_multi_rows = false;
+0043 <span class="keyword">end</span>
+0044 
+0045 <span class="keyword">if</span> is_multi_rows
+0046     data = flip(data, 1);
+0047 <span class="keyword">end</span>
+0048 
+0049 <span class="keyword">if</span> isfield(args, <span class="string">'windows'</span>)
+0050 <span class="comment">%     max_trial_due = max(args.trial_times(:,2)-args.trial_times(:,1));</span>
+0051 <span class="comment">%     text_offset = text_offset * (max_trial_due/100);</span>
+0052     text_offset = args.windows(1,1) - 0.1;
+0053     
+0054     <span class="comment">% reverse visualization order</span>
+0055     <span class="keyword">if</span> is_multi_rows
+0056         args.windows = flip(args.windows, 1);
+0057     <span class="keyword">end</span>
+0058     <span class="keyword">if</span> isempty(row_text)
+0059         row_text = cell(1, num_rows);
+0060         <span class="keyword">for</span> ridx = 1:num_rows
+0061             text_one = sprintf(<span class="string">'%d - %d'</span>, args.windows(ridx, 1), args.windows(ridx, 2));
+0062             row_text{ridx} = text_one;
+0063         <span class="keyword">end</span>
+0064     <span class="keyword">end</span>
+0065 <span class="keyword">end</span>
+0066 
+0067 <span class="keyword">if</span> isfield(args, <span class="string">'time_ref'</span>) &amp;&amp; is_multi_rows
+0068     args.time_ref = flip(args.time_ref, 1);
+0069 <span class="keyword">end</span>
+0070 
+0071 <span class="keyword">if</span> ~exist(<span class="string">'args'</span>, <span class="string">'var'</span>)
+0072     args.info = <span class="string">'No user input information here'</span>;
+0073 <span class="keyword">end</span>
+0074 
+0075 <span class="comment">% How many instances on each figure</span>
+0076 <span class="keyword">if</span> isfield(args, <span class="string">'MAX_ROWS'</span>)
+0077     MAX_ROWS = args.MAX_ROWS;
+0078 <span class="keyword">else</span>
+0079     MAX_ROWS = 20;
+0080 <span class="keyword">end</span>
+0081 
+0082 <span class="keyword">if</span> isfield(args, <span class="string">'colormap'</span>)
+0083     colormap = args.colormap;
+0084 <span class="keyword">else</span>
+0085     colormap = <a href="get_colormap.html" class="code" title="function colormap = get_colormap(n, is_plot_colormap)">get_colormap</a>();
+0086 <span class="keyword">end</span>
+0087 
+0088 <span class="keyword">if</span> isfield(args, <span class="string">'color_code'</span>)
+0089     color_code = args.color_code;
+0090 <span class="keyword">else</span>
+0091     color_code = <span class="string">'category'</span>;
+0092 <span class="keyword">end</span>
+0093 
+0094 <span class="keyword">if</span> isfield(args, <span class="string">'sample_rate'</span>)
+0095     sample_rate = args.sample_rate;
+0096 <span class="keyword">else</span>
+0097     sample_rate = timevp_config_dataset_info();
+0098 <span class="keyword">end</span>
+0099 
+0100 <span class="keyword">if</span> isfield(args, <span class="string">'is_closeplot'</span>)
+0101     is_closeplot = args.is_closeplot;
+0102 <span class="keyword">elseif</span> isfield(args, <span class="string">'dir_plots'</span>) || isfield(args, <span class="string">'save_name'</span>)
+0103     is_closeplot = true;
+0104 <span class="keyword">else</span>
+0105     is_closeplot = false;
+0106 <span class="keyword">end</span>
+0107 
+0108 <span class="comment">% preprocess cell data, transfer it into a matrix</span>
+0109 <span class="keyword">if</span> iscell(data)
+0110     num_data_stream = size(data, 2);
+0111     data_new = {};
+0112     max_num_cvent_data_column = nan(1,num_data_stream);
+0113     
+0114     <span class="comment">% go through each stream (each column in the cell data)</span>
+0115     <span class="keyword">for</span> dsidx = 1:num_data_stream
+0116         data_column = data(:,dsidx);
+0117         <span class="comment">%var_type = get_data_type(args.var_name_list{dsidx});</span>
+0118         
+0119         data_column_length = cellfun(@(data_one) <span class="keyword">...</span>
+0120             size(data_one, 1), <span class="keyword">...</span>
+0121             data_column, <span class="keyword">...</span>
+0122             <span class="string">'UniformOutput'</span>, false);
+0123         data_column_length = vertcat(data_column_length{:});
+0124         list_cevent_length = unique(data_column_length(:,1));
+0125         max_data_column_length = max(list_cevent_length);
+0126         
+0127         <span class="comment">% if data is a cell and needs to be processed</span>
+0128         <span class="keyword">if</span> sum(~ismember(list_cevent_length, 1)) &gt; 0
+0129             data_column_new = nan(length(data_column), max_data_column_length*LENGTH_CEVENT);
+0130             <span class="keyword">for</span> didx = 1:length(data_column)
+0131                 data_column_one = data_column{didx};
+0132                 
+0133                 <span class="comment">% convert stream to events</span>
+0134                 <span class="keyword">if</span> size(data_column_one, 2) &lt; 3
+0135                     data_column_one = <a href="stream2event.html" class="code" title="function result = stream2event(stream, sample_rate, include_zero)">stream2event</a>(data_column_one, sample_rate);
+0136                 <span class="keyword">end</span>
+0137                 
+0138                 <span class="keyword">for</span> doidx = 1:max_data_column_length
+0139                     <span class="keyword">if</span> doidx &lt;= size(data_column_one,1)
+0140                         data_column_new(didx,(doidx-1)*3+1:doidx*3) = <span class="keyword">...</span>
+0141                             data_column_one(doidx,1:3);
+0142                     <span class="keyword">end</span>
+0143                 <span class="keyword">end</span>
+0144             <span class="keyword">end</span>
+0145         <span class="keyword">else</span>
+0146             data_column_new = vertcat(data_column{:});
+0147             max_data_column_length = list_cevent_length(1);
+0148         <span class="keyword">end</span>
+0149         <span class="keyword">if</span> max_data_column_length &lt; 1
+0150             tmp_len = length(data_column_length);
+0151             data_column_new = nan(tmp_len, 3);
+0152         <span class="keyword">end</span>
+0153         data_new{dsidx} = data_column_new;
+0154         max_num_cvent_data_column(dsidx) = max(max_data_column_length, 1);
+0155     <span class="keyword">end</span>
+0156     data = horzcat(data_new{:});
+0157     tmp_count = 0;
+0158     <span class="keyword">for</span> tmpi = 1:length(max_num_cvent_data_column)
+0159         prev_tmp_count = tmp_count + 1;
+0160         tmp_count = tmp_count + max_num_cvent_data_column(tmpi);
+0161         stream_position_new(prev_tmp_count:tmp_count) = <span class="keyword">...</span>
+0162             tmpi;
+0163     <span class="keyword">end</span>
+0164     <span class="keyword">if</span> ~isfield(args, <span class="string">'stream_position'</span>)
+0165         args.stream_position = stream_position_new;
+0166     <span class="keyword">end</span>
+0167 <span class="keyword">end</span>
+0168 
+0169 <span class="comment">% end</span>
+0170 [rows, cols] = size(data);
+0171 <span class="keyword">if</span> ~iscell(data)
+0172     cols = cols / LENGTH_CEVENT;
+0173 <span class="keyword">end</span>
+0174 
+0175 <span class="keyword">if</span> ~isfield(args, <span class="string">'stream_position'</span>)
+0176     args.stream_position = ones(1,cols);
+0177 <span class="keyword">end</span>
+0178 
+0179 <span class="keyword">if</span> isfield(args, <span class="string">'legend'</span>)
+0180     <span class="keyword">if</span> ~isfield(args, <span class="string">'legend_location'</span>)
+0181         <span class="keyword">if</span> ~exist(<span class="string">'cont_args'</span>, <span class="string">'var'</span>)
+0182             args.legend_location = <span class="string">'NorthEastOutside'</span>;
+0183         <span class="keyword">else</span>
+0184             args.legend_location = <span class="string">'NorthWestOutside'</span>;
+0185         <span class="keyword">end</span>
+0186     <span class="keyword">end</span>
+0187     <span class="keyword">if</span> ~isfield(args, <span class="string">'legend_orientation'</span>)
+0188         args.legend_orientation = <span class="string">'vertical'</span>;
+0189     <span class="keyword">end</span>
+0190 <span class="keyword">end</span>
+0191 
+0192 <span class="keyword">if</span> isfield(args, <span class="string">'ForceZero'</span>)
+0193     <span class="keyword">if</span> isfield(args, <span class="string">'ref_index'</span>)
+0194         ref_index = args.ref_index;
+0195     <span class="keyword">elseif</span> isfield(args, <span class="string">'ref_column'</span>)
+0196         ref_column = args.ref_column;
+0197     <span class="keyword">else</span>
+0198         ref_column = 2;
+0199     <span class="keyword">end</span>
+0200     
+0201     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0202     <span class="keyword">if</span> ~iscell(data)
+0203         <span class="keyword">if</span> isfield(args, <span class="string">'time_ref'</span>)
+0204             time_ref = args.time_ref;
+0205         <span class="keyword">elseif</span> exist(<span class="string">'ref_column'</span>, <span class="string">'var'</span>)
+0206             time_ref = data(:,ref_column);
+0207         <span class="keyword">else</span>
+0208             time_ref = data(ref_index(1), ref_index(2));
+0209             time_ref = repmat(time_ref, size(data,1), 1);
+0210         <span class="keyword">end</span>
+0211         
+0212         tmp_ref_nan = sum(isnan(time_ref));
+0213         <span class="keyword">if</span> tmp_ref_nan &gt; 0
+0214             error(<span class="string">'Error! There is nan data in the reference time column!'</span>);
+0215         <span class="keyword">end</span>
+0216         data_mat = data;
+0217     <span class="keyword">else</span>
+0218         data_mat = cell2mat(data);
+0219         <span class="keyword">if</span> isfield(args, <span class="string">'time_ref'</span>)
+0220             time_ref = args.time_ref;
+0221         <span class="keyword">elseif</span> exist(<span class="string">'ref_column'</span>, <span class="string">'var'</span>)
+0222             time_ref = data(:,ref_column);
+0223         <span class="keyword">else</span>
+0224             time_ref = data(ref_index(1), ref_index(2));
+0225             time_ref = repmat(time_ref, size(data,1), 1);
+0226         <span class="keyword">end</span>
+0227         <span class="keyword">if</span> sum(isnan(time_ref)) &gt; 0
+0228 <span class="comment">%             time_idx_list = sort([1:3:size(data_mat,2) 2:3:size(data_mat,2)]);</span>
+0229             nan_count_data = sum(isnan(data_mat));
+0230             [I J] = find(nan_count_data);
+0231             ref_column = min(setdiff(1:size(data_mat,2), J));
+0232             <span class="keyword">if</span> isfield(args, <span class="string">'ref_column'</span>)
+0233                 warning([<span class="string">'The reference column for ForceZero time has NaN '</span> <span class="keyword">...</span>
+0234                     <span class="string">'values and thus is changd to column '</span> int2str(ref_column) <span class="string">'.'</span>]);
+0235             <span class="keyword">end</span>
+0236             time_ref = data_mat(:,ref_column);
+0237         <span class="keyword">end</span>
+0238     <span class="keyword">end</span>
+0239     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0240     <span class="keyword">for</span> j = cols:-1:1
+0241         data_mat(:,j*LENGTH_CEVENT-1) = data_mat(:,j*LENGTH_CEVENT-1) - time_ref;
+0242         data_mat(:,j*LENGTH_CEVENT-2) = data_mat(:,j*LENGTH_CEVENT-2) - time_ref;
+0243     <span class="keyword">end</span>
+0244 <span class="keyword">else</span>
+0245     data_mat = data;
+0246 <span class="keyword">end</span>
+0247 
+0248 <span class="keyword">if</span> strcmp(color_code, <span class="string">'category'</span>)    
+0249     value_idx_list = 3:LENGTH_CEVENT:size(data_mat,2);
+0250     max_cevent_value = max(max(data_mat(:,value_idx_list)));
+0251 <span class="keyword">end</span>
+0252 
+0253 <span class="comment">% to calculate how many figure will be needed in total</span>
+0254 num_figures = floor(rows/MAX_ROWS)+ceil(mod(rows/MAX_ROWS, 1));
+0255 
+0256 <span class="keyword">for</span> fidx = 1:num_figures
+0257     <span class="keyword">if</span> isfield(args, <span class="string">'figure_visible'</span>) &amp;&amp; ~args.figure_visible
+0258         h = figure(<span class="string">'Visible'</span>,<span class="string">'Off'</span>);
+0259     <span class="keyword">else</span>
+0260         h = figure;
+0261     <span class="keyword">end</span>
+0262     
+0263     <span class="keyword">if</span> exist(<span class="string">'cont_data'</span>, <span class="string">'var'</span>)
+0264         subplot(1,2,1);
+0265         
+0266         <span class="keyword">if</span> ~exist(<span class="string">'cont_args'</span>, <span class="string">'var'</span>)
+0267             cont_args.info = <span class="string">'No user input information here'</span>;
+0268         <span class="keyword">end</span>
+0269         
+0270         cont_args.stream_position = args.stream_position;
+0271         
+0272         <span class="keyword">if</span> ~isfield(cont_args, <span class="string">'colormap'</span>)
+0273             cont_args.colormap = {};
+0274         <span class="keyword">end</span>
+0275         
+0276         <span class="keyword">if</span> ~isfield(cont_args, <span class="string">'LineWidth'</span>)
+0277             cont_args.LineWidth = 1;
+0278         <span class="keyword">end</span>        
+0279         
+0280         <span class="keyword">if</span> isfield(cont_args, <span class="string">'legend'</span>) &amp;&amp; ~isfield(cont_args, <span class="string">'legend_location'</span>)
+0281             cont_args.legend_location = <span class="string">'NorthEastOutside'</span>;
+0282         <span class="keyword">end</span>
+0283     <span class="keyword">end</span>
+0284     <span class="comment">%% The first half of the figure</span>
+0285     hold on;
+0286     
+0287     <span class="comment">% to get how many rows/instances will be in this figure</span>
+0288     <span class="keyword">if</span> fidx == num_figures
+0289         <span class="keyword">if</span> mod(rows, MAX_ROWS) == 0
+0290             rows_one = MAX_ROWS;
+0291         <span class="keyword">else</span>
+0292             rows_one = mod(rows, MAX_ROWS);
+0293         <span class="keyword">end</span>
+0294     <span class="keyword">else</span>
+0295         rows_one = MAX_ROWS;
+0296     <span class="keyword">end</span>
+0297     
+0298     <span class="keyword">if</span> isfield(args, <span class="string">'position_row_width'</span>)
+0299         position_row_width = args.position_row_width;
+0300     <span class="keyword">else</span>
+0301         position_row_width = 150;
+0302     <span class="keyword">end</span>
+0303     
+0304     <span class="keyword">if</span> isfield(args, <span class="string">'set_position'</span>)
+0305         set(h, <span class="string">'Position'</span>, args.set_position, <span class="string">'Color'</span>, figure_bgcolor);
+0306     <span class="keyword">else</span>
+0307         fig_position = [50 50 1600 (100+position_row_width*rows_one)];
+0308         set(h, <span class="string">'Position'</span>, fig_position, <span class="string">'Color'</span>, figure_bgcolor);
+0309     <span class="keyword">end</span>
+0310     
+0311     <span class="comment">% to get the sub chunk of data for this figure</span>
+0312     <span class="keyword">if</span> fidx == num_figures
+0313         sub_data_mat = data_mat((fidx-1)*MAX_ROWS+1:<span class="keyword">end</span>,:);
+0314     <span class="keyword">else</span>
+0315         sub_data_mat = data_mat((fidx-1)*MAX_ROWS+1:(fidx)*MAX_ROWS,:);
+0316     <span class="keyword">end</span>
+0317     
+0318     start_time_idx = 1:LENGTH_CEVENT:size(sub_data_mat,2);
+0319     end_time_idx = 2:LENGTH_CEVENT:size(sub_data_mat,2);
+0320     
+0321     <span class="keyword">if</span> isfield(args, <span class="string">'xlim_list'</span>)
+0322         xlim_list = args.xlim_list;
+0323         min_x = xlim_list(1);
+0324         max_x = xlim_list(2);
+0325     <span class="keyword">else</span>
+0326         <span class="comment">%min_x = nanmin(nanmin(sub_data_mat(:,start_time_idx))) - 0.1;</span>
+0327         <span class="comment">%max_x = nanmax(nanmax(sub_data_mat(:,end_time_idx))) + 0.1;</span>
+0328         min_x = min(min(sub_data_mat(:,start_time_idx),[],<span class="string">'omitnan'</span>),[], <span class="string">'omitnan'</span>) - 0.1;
+0329         max_x = max(max(sub_data_mat(:,end_time_idx),[],<span class="string">'omitnan'</span>),[],<span class="string">'omitnan'</span>) + 0.1;
+0330         xlim_list = [min_x max_x];
+0331         max_y = 0;
+0332     <span class="keyword">end</span>
+0333     
+0334     text_offset = min_x - (max_x-min_x)/100;
+0335     length_of_streams = length(unique(args.stream_position));
+0336     each_stream_space = 1/length_of_streams;
+0337     
+0338     <span class="comment">% draw legend cubics</span>
+0339     <span class="keyword">if</span> isfield(args, <span class="string">'legend'</span>)
+0340         <span class="keyword">for</span> lidx = 1:length(args.legend)
+0341             x = [min_x, min_x, min_x, min_x];
+0342             y = [0.1, 1, 1, 0.1];
+0343             <span class="keyword">if</span> iscell(colormap)
+0344                 color = colormap{lidx};
+0345             <span class="keyword">else</span>
+0346                 color = colormap(lidx, :);
+0347             <span class="keyword">end</span>
+0348             fill(x, y, color);
+0349         <span class="keyword">end</span>
+0350     <span class="keyword">end</span>
+0351 
+0352     <span class="keyword">if</span> ~isempty(row_text)
+0353         row_text_pos_y = nan(MAX_ROWS, 1);
+0354     <span class="keyword">end</span>
+0355     
+0356     <span class="comment">% Draw the background bars - white / grey</span>
+0357     <span class="keyword">for</span> rowidx = 1:MAX_ROWS
+0358         <span class="comment">% Draw left to right in each row</span>
+0359         x = [min_x, max_x, max_x, min_x];
+0360         y = [(rowidx-1)*(1+each_stream_space), (rowidx-1)*(1+each_stream_space), <span class="keyword">...</span>
+0361             rowidx*(1+each_stream_space), rowidx*(1+each_stream_space)];
+0362         color = [1 1 1];
+0363 <span class="comment">%         if mod(rowidx, 2) &lt; 1</span>
+0364 <span class="comment">%             color = [1 1 1];</span>
+0365 <span class="comment">%         else</span>
+0366 <span class="comment">%             color = [0.8 0.8 0.8];</span>
+0367 <span class="comment">%         end</span>
+0368         fill(x, y, color);
+0369     <span class="keyword">end</span>
+0370     
+0371     <span class="comment">% Draw actual instances row by row</span>
+0372     <span class="keyword">for</span> rowidx = 1:rows_one
+0373 <span class="comment">%         min_y_row = 99;</span>
+0374 <span class="comment">%         max_y_row = 0;</span>
+0375         <span class="comment">% Draw left to right in each row</span>
+0376         pos_num_old = -1;
+0377         <span class="keyword">for</span> columnidx = 1:cols
+0378             cevent_one = data_mat(rowidx+(fidx-1)*MAX_ROWS,(columnidx-1)*3+1:(columnidx-1)*3+3);
+0379             pos_num_new = args.stream_position(columnidx);
+0380             <span class="keyword">if</span> isfield(args, <span class="string">'annotation'</span>)
+0381                 <span class="keyword">if</span> iscell(args.annotation)
+0382                     var_text_one =  args.annotation{pos_num_new};
+0383                 <span class="keyword">elseif</span> ischar(args.annotation)
+0384                     var_text_one = sprintf(<span class="string">'%s%d'</span>, args.annotation, pos_num_new);
+0385                 <span class="keyword">end</span>
+0386             <span class="keyword">end</span>
+0387             
+0388             <span class="keyword">if</span> ~(isempty(cevent_one) || sum(isnan(cevent_one)) &gt; 0)
+0389                 start_time = cevent_one(1);
+0390                 end_time = cevent_one(2);
+0391                 
+0392                 <span class="keyword">if</span> strcmp(color_code, <span class="string">'category'</span>)
+0393                     color = <a href="#_sub1" class="code" title="subfunction color = get_color(k, k_base, colormap)">get_color</a>(cevent_one(3), max_cevent_value, colormap);
+0394                 <span class="keyword">elseif</span> strcmp(color_code, <span class="string">'variable'</span>)
+0395                     color = <a href="#_sub1" class="code" title="subfunction color = get_color(k, k_base, colormap)">get_color</a>(columnidx, cols, colormap); <span class="comment">%get_color(cevent_one(3));</span>
+0396 <span class="comment">%                     args.edge_color = get_color(mod(cevent_one(3), 10), max_cevent_value, colormap);</span>
+0397                 <span class="keyword">end</span>
+0398                 [~, y] = <a href="#_sub2" class="code" title="subfunction [x, y] = create_square(x1, x2, y1, cidx, color, args)">create_square</a>(start_time, end_time, rowidx, columnidx, color, args);
+0399                 text_color = [0 0 0];
+0400             <span class="keyword">elseif</span> (cevent_one(3) == 0)
+0401                 text_color = [1 0 0];
+0402                 [~, y] = <a href="#_sub2" class="code" title="subfunction [x, y] = create_square(x1, x2, y1, cidx, color, args)">create_square</a>(0, 0, rowidx, columnidx, [1 1 1], args);
+0403             <span class="keyword">else</span> <span class="comment">% if there is variable, but no data inside</span>
+0404                 text_color = [1 1 1] * 0.8;
+0405                 [~, y] = <a href="#_sub2" class="code" title="subfunction [x, y] = create_square(x1, x2, y1, cidx, color, args)">create_square</a>(0, 0, rowidx, columnidx, [1 1 1], args);
+0406             <span class="keyword">end</span>
+0407             
+0408             y_new = mean(y);
+0409             <span class="keyword">if</span> pos_num_old ~= pos_num_new &amp;&amp; isfield(args, <span class="string">'annotation'</span>)
+0410                 text(text_offset, y_new, var_text_one, <span class="string">'FontSize'</span>, 8, <span class="string">'Color'</span>, text_color, <span class="keyword">...</span>
+0411                     <span class="string">'BackgroundColor'</span>, text_bgcolor, <span class="string">'Interpreter'</span>, <span class="string">'none'</span>, <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>);
+0412             <span class="keyword">end</span>
+0413             pos_num_old = pos_num_new;
+0414         <span class="keyword">end</span> <span class="comment">% end of columniedx</span>
+0415         <span class="keyword">if</span> ~isempty(row_text)
+0416             row_text_pos_y(rowidx) = y(1);
+0417         <span class="keyword">end</span>
+0418         max_y = rowidx*(1+each_stream_space);
+0419     <span class="keyword">end</span>
+0420     
+0421     <span class="comment">% draw verticle lines according to the user</span>
+0422     <span class="keyword">if</span> isfield(args, <span class="string">'vert_line'</span>)
+0423         <span class="keyword">for</span> vidx = 1:length(args.vert_line)
+0424             x = [args.vert_line(vidx), args.vert_line(vidx), args.vert_line(vidx)+0.01, args.vert_line(vidx)+0.01];
+0425             y = [0, max_y, max_y, 0];
+0426             color = [1 0 0];
+0427             fill(x, y, <span class="string">'r'</span>, <span class="string">'EdgeColor'</span>, color);
+0428         <span class="keyword">end</span>
+0429     <span class="keyword">end</span>
+0430 
+0431     <span class="comment">% set transpenrency, so the overlaps between cevents can be shown</span>
+0432     <span class="keyword">if</span> isfield(args, <span class="string">'transparency'</span>)
+0433         alpha(args.transparency);
+0434     <span class="keyword">end</span>
+0435     
+0436     <span class="keyword">if</span> isfield(args, <span class="string">'legend'</span>)
+0437         new_legend = cell(size(args.legend));
+0438         <span class="keyword">for</span> i = 1:length(args.legend)
+0439             new_legend{i} = plot_no_underline(args.legend{i});
+0440         <span class="keyword">end</span>
+0441         
+0442         legend(new_legend, <span class="string">'Location'</span>, args.legend_location, <span class="string">'Orientation'</span>, args.legend_orientation);
+0443         legend(<span class="string">'boxoff'</span>);
+0444     <span class="keyword">end</span>
+0445     
+0446     <span class="keyword">if</span> ~isempty(row_text)
+0447         <span class="keyword">for</span> rowidx = 1:rows_one
+0448             txrowidx = rowidx+(fidx-1)*MAX_ROWS;
+0449             <span class="keyword">if</span> isfield(args, <span class="string">'row_text_type'</span>) &amp;&amp; strcmp(args.row_text_type, <span class="string">'time'</span>)
+0450                 row_text_one = sprintf(<span class="string">'%s: %.1f-%.1f'</span>, row_text{txrowidx}, args.trial_times(rowidx, 1), args.trial_times(rowidx, 2));
+0451             <span class="keyword">elseif</span> iscell(row_text)
+0452                 row_text_one = row_text{txrowidx};
+0453             <span class="keyword">else</span>
+0454                 row_text_one = row_text;
+0455             <span class="keyword">end</span>
+0456             text(max_x+0.1, row_text_pos_y(rowidx), row_text_one, <span class="string">'FontWeight'</span>, <span class="string">'bold'</span>, <span class="string">'Interpreter'</span>, <span class="string">'none'</span>);<span class="comment">%, 'FontSize', 12, 'BackgroundColor', [1 1 1]); -1*length(row_text_one)</span>
+0457         <span class="keyword">end</span>
+0458     <span class="keyword">end</span>
+0459     
+0460     <span class="keyword">if</span> isfield(args, <span class="string">'ylim_list'</span>)
+0461         ylim_list = args.ylim_list;
+0462     <span class="keyword">else</span>
+0463         ylim_list = [0 max_y];
+0464     <span class="keyword">end</span>
+0465     
+0466     xlim(xlim_list);
+0467     ylim(ylim_list);
+0468     
+0469     <span class="keyword">if</span> isfield(args, <span class="string">'title'</span>)
+0470         title(plot_no_underline(args.title), <span class="string">'FontWeight'</span>, <span class="string">'bold'</span>); <span class="comment">%, 'FontSize', 12, 'BackgroundColor', [1 1 1]</span>
+0471     <span class="keyword">end</span>
+0472     
+0473     <span class="keyword">if</span> isfield(args, <span class="string">'xlabel'</span>)
+0474         xlabel(args.xlabel);
+0475     <span class="keyword">end</span>
+0476     
+0477     <span class="keyword">if</span> isfield(args, <span class="string">'ForceZero'</span>)
+0478         set(gca,<span class="string">'xtick'</span>,[]);
+0479     <span class="keyword">end</span>
+0480     
+0481     <span class="comment">%% the second half of the plot if applicable</span>
+0482     <span class="keyword">if</span> exist(<span class="string">'cont_data'</span>, <span class="string">'var'</span>)
+0483         subplot(1,2,2);
+0484         hold on;
+0485         
+0486         <span class="comment">% draw legend cubics</span>
+0487         <span class="keyword">if</span> isfield(cont_args, <span class="string">'legend'</span>) &amp;&amp; isfield(cont_args, <span class="string">'colormap'</span>)
+0488             <span class="keyword">for</span> lidx = 1:length(cont_args.legend)
+0489                 color = <a href="#_sub1" class="code" title="subfunction color = get_color(k, k_base, colormap)">get_color</a>(lidx, length(cont_args.legend), colormap);
+0490                 line([0], [0], <span class="string">'Color'</span>, color);
+0491             <span class="keyword">end</span>
+0492         <span class="keyword">end</span>
+0493         
+0494         <span class="comment">% to get the sub chunk of cont_data for this figure</span>
+0495         <span class="keyword">if</span> fidx == num_figures
+0496             sub_cont_data_mat = cont_data((fidx-1)*MAX_ROWS+1:<span class="keyword">end</span>,:);
+0497             sub_time_ref = time_ref((fidx-1)*MAX_ROWS+1:<span class="keyword">end</span>,:);
+0498         <span class="keyword">else</span>
+0499             sub_cont_data_mat = cont_data((fidx-1)*MAX_ROWS+1:(fidx)*MAX_ROWS,:);
+0500             sub_time_ref = time_ref((fidx-1)*MAX_ROWS+1:(fidx)*MAX_ROWS,:);
+0501         <span class="keyword">end</span>
+0502 
+0503         min_x = 99;
+0504         max_x = -99;        
+0505         <span class="keyword">for</span> rowidx = 1:rows_one
+0506             vec = sub_cont_data_mat{rowidx,1};
+0507             tmp_min_x = min((vec(:,1) - sub_time_ref(rowidx)),[], <span class="string">'omitnan'</span>);
+0508             tmp_max_x = max((vec(:,1) - sub_time_ref(rowidx)),[], <span class="string">'omitnan'</span>);
+0509             <span class="keyword">if</span> tmp_min_x &lt; min_x
+0510                 min_x = tmp_min_x;
+0511             <span class="keyword">end</span>
+0512             <span class="keyword">if</span> tmp_max_x &gt; max_x
+0513                 max_x = tmp_max_x;
+0514             <span class="keyword">end</span>
+0515         <span class="keyword">end</span>
+0516         min_x = min_x - 0.2;
+0517         max_x = max_x + 0.2;
+0518 
+0519         <span class="comment">% Draw the background bars - white / grey</span>
+0520         <span class="keyword">for</span> rowidx = 1:MAX_ROWS
+0521             <span class="comment">% Draw left to right in each row</span>
+0522             x = [min_x, max_x, max_x, min_x];
+0523             y = [(rowidx-1)*(1+each_stream_space), (rowidx-1)*(1+each_stream_space), <span class="keyword">...</span>
+0524                 rowidx*(1+each_stream_space), rowidx*(1+each_stream_space)];
+0525             <span class="keyword">if</span> mod(rowidx, 2) &lt; 1
+0526                 color = [1 1 1];
+0527             <span class="keyword">else</span>
+0528                 color = [0.8 0.8 0.8];
+0529             <span class="keyword">end</span>
+0530             fill(x, y, color);
+0531         <span class="keyword">end</span>
+0532         
+0533         <span class="keyword">if</span> isfield(cont_args, <span class="string">'target_value_ref_column'</span>)
+0534             target_value_ref_column = cont_args.target_value_ref_column;
+0535             <span class="keyword">if</span> mod(target_value_ref_column, LENGTH_CEVENT) ~= 0
+0536                 error(<span class="string">'Invalid target_value_ref_column value!'</span>);
+0537             <span class="keyword">end</span>                
+0538 
+0539             value_column = sub_data_mat(:,target_value_ref_column);
+0540         <span class="keyword">end</span>
+0541         
+0542         <span class="comment">% start draw lines one by one</span>
+0543         <span class="keyword">for</span> rowidx = 1:rows_one
+0544             <span class="keyword">if</span> isfield(cont_args, <span class="string">'target_value_ref_column'</span>)
+0545                 value_id = value_column(rowidx);                
+0546                 vec = sub_cont_data_mat{rowidx,value_id};
+0547                 
+0548                 <span class="keyword">if</span> ~isempty(cont_args.colormap)
+0549                     color = cont_args.colormap{value_id};
+0550                 <span class="keyword">else</span>
+0551                     color = <a href="#_sub1" class="code" title="subfunction color = get_color(k, k_base, colormap)">get_color</a>(value_id, size(sub_cont_data_mat, 2), colormap); <span class="comment">%get_color(cevent_one(3));</span>
+0552                 <span class="keyword">end</span>
+0553                 
+0554                 <a href="#_sub3" class="code" title="subfunction ln = create_line(vec, row, time_ref, color, args)">create_line</a>(vec, rowidx, sub_time_ref(rowidx), color, cont_args);
+0555             <span class="keyword">else</span>
+0556                 <span class="keyword">for</span> cdmi = 1:size(sub_cont_data_mat, 2)                
+0557                     <span class="keyword">if</span> ~isempty(cont_args.colormap)
+0558                         color = cont_args.colormap{cdmi};
+0559                     <span class="keyword">else</span>
+0560                         color = <a href="#_sub1" class="code" title="subfunction color = get_color(k, k_base, colormap)">get_color</a>(cdmi, size(sub_cont_data_mat, 2), colormap); <span class="comment">%get_color(cevent_one(3));</span>
+0561                     <span class="keyword">end</span>
+0562 
+0563                     vec = sub_cont_data_mat{rowidx,cdmi};
+0564                     <a href="#_sub3" class="code" title="subfunction ln = create_line(vec, row, time_ref, color, args)">create_line</a>(vec, rowidx, sub_time_ref(rowidx), color, cont_args);
+0565                 <span class="keyword">end</span>
+0566             <span class="keyword">end</span>
+0567         <span class="keyword">end</span>
+0568         
+0569         <span class="comment">% draw verticle lines according to the user</span>
+0570         <span class="keyword">if</span> isfield(cont_args, <span class="string">'vert_line'</span>)
+0571             <span class="keyword">for</span> vidx = 1:length(cont_args.vert_line)
+0572                 x = [cont_args.vert_line(vidx), cont_args.vert_line(vidx), cont_args.vert_line(vidx)+0.01, cont_args.vert_line(vidx)+0.01];
+0573                 y = [0, max_y, max_y, 0];
+0574                 color = [1 1 1];
+0575                 fill(x, y, <span class="string">'k'</span>, <span class="string">'EdgeColor'</span>, color);
+0576             <span class="keyword">end</span>
+0577         <span class="keyword">end</span>
+0578 
+0579         xlim([min_x max_x]);
+0580         ylim([0 max_y]);
+0581         
+0582         <span class="keyword">if</span> isfield(cont_args, <span class="string">'legend'</span>)
+0583             new_legend = cell(size(cont_args.legend));
+0584             <span class="keyword">for</span> i = 1:length(cont_args.legend)
+0585                 new_legend{i} = plot_no_underline(cont_args.legend{i});
+0586             <span class="keyword">end</span>
+0587             legend(new_legend, <span class="string">'Location'</span>, cont_args.legend_location);
+0588         <span class="keyword">end</span>
+0589 
+0590         <span class="keyword">if</span> isfield(cont_args, <span class="string">'title'</span>)
+0591             title(plot_no_underline(cont_args.title), <span class="string">'FontSize'</span>, 14, <span class="string">'FontWeight'</span>, <span class="string">'bold'</span>);
+0592         <span class="keyword">end</span>
+0593     <span class="keyword">end</span>
+0594     
+0595     set(gca, <span class="string">'ytick'</span>, []);
+0596     hold off;
+0597     
+0598     <span class="comment">%% all the plotting is done, start saving</span>
+0599     <span class="keyword">if</span> isfield(args, <span class="string">'dir_plots'</span>)
+0600         dir_plots = args.dir_plots;
+0601         <span class="keyword">if</span> ~exist(dir_plots, <span class="string">'dir'</span>)
+0602             mkdir(dir_plots);
+0603         <span class="keyword">end</span>
+0604     <span class="keyword">else</span>
+0605         dir_plots = [];
+0606     <span class="keyword">end</span>
+0607         
+0608     <span class="keyword">if</span> isfield(args, <span class="string">'save_name'</span>)
+0609         save_name = args.save_name;
+0610     <span class="keyword">else</span>
+0611         save_name = sprintf(<span class="string">'timevp_vis_streams_demo_%s'</span>, datestr(now,<span class="string">'mm-dd-yyyy_HH-MM'</span>));
+0612     <span class="keyword">end</span>
+0613         
+0614     <span class="keyword">if</span> ~isfield(args, <span class="string">'save_format'</span>)
+0615         save_format = <span class="string">'png'</span>;
+0616     <span class="keyword">else</span>
+0617         save_format = args.save_format;
+0618     <span class="keyword">end</span>
+0619     
+0620     set(h,<span class="string">'PaperPositionMode'</span>,<span class="string">'auto'</span>);
+0621 <span class="comment">%         if isfield(args, 'figure_visible') &amp;&amp; ~args.figure_visible</span>
+0622     <span class="keyword">if</span> num_figures &lt; 2
+0623         <span class="keyword">if</span> ~isempty(dir_plots)
+0624             plot_fullpath = fullfile(dir_plots, [save_name <span class="string">'.'</span> save_format]);
+0625         <span class="keyword">else</span>
+0626             plot_fullpath = [save_name <span class="string">'.'</span> save_format];
+0627         <span class="keyword">end</span>
+0628     <span class="keyword">else</span>
+0629         <span class="keyword">if</span> ~isempty(dir_plots)
+0630             plot_fullpath = fullfile(dir_plots, [save_name <span class="string">'_'</span> int2str(fidx) <span class="string">'.'</span> save_format]);
+0631         <span class="keyword">else</span>
+0632             plot_fullpath = [save_name <span class="string">'_'</span> int2str(fidx) <span class="string">'.'</span> save_format];
+0633         <span class="keyword">end</span>
+0634     <span class="keyword">end</span>
+0635     
+0636     saveas(h, plot_fullpath)
+0637     fprintf(<span class="string">'Plot %s saved.\n'</span>, plot_fullpath);
+0638 
+0639     <span class="keyword">if</span> isfield(args, <span class="string">'pause_before_save'</span>) &amp;&amp; args.pause_before_save
+0640         pause
+0641     <span class="keyword">end</span>
+0642 <span class="comment">%         print(h, '-dpsc', [save_name '_' int2str(fidx) '.' save_format]);</span>
+0643     <span class="keyword">if</span> is_closeplot
+0644         close(h);
+0645     <span class="keyword">end</span>
+0646 <span class="keyword">end</span>
+0647 
+0648 <span class="keyword">end</span>
+0649 
+0650 <span class="comment">% Get color according to rainbow color cue pallet</span>
+0651 <a name="_sub1" href="#_subfunctions" class="code">function color = get_color(k, k_base, colormap)</a>
+0652     <span class="keyword">if</span> ~isempty(colormap)
+0653         <span class="keyword">if</span> iscell(colormap)
+0654             color = colormap{k};
+0655         <span class="keyword">else</span>
+0656             color = colormap(k, :);
+0657         <span class="keyword">end</span>
+0658     <span class="keyword">else</span>
+0659         color = hsv2rgb([k/k_base,1,0.85]);
+0660     <span class="keyword">end</span>
+0661 <span class="keyword">end</span>
+0662 
+0663 <span class="comment">% Draw one rectangle</span>
+0664 <span class="comment">% x1: start time</span>
+0665 <span class="comment">% x2: end time</span>
+0666 <span class="comment">% y1: y axe coordinate (center)</span>
+0667 <span class="comment">% color: color of the shape</span>
+0668 <span class="comment">% height: the height of each rectangle, default value is 0.25</span>
+0669 <a name="_sub2" href="#_subfunctions" class="code">function [x, y] = create_square(x1, x2, y1, cidx, color, args)          </a>
+0670     length_of_streams = length(unique(args.stream_position));
+0671     each_stream_space = 1/length_of_streams;
+0672     position_value = args.stream_position(cidx);
+0673 <span class="comment">%         color = color*(each_stream_space*position_value)+...</span>
+0674 <span class="comment">%             (1-each_stream_space*position_value);</span>
+0675     y1 = (y1-1)*(1+each_stream_space);
+0676     y1 = y1 + (length_of_streams-position_value+1)*each_stream_space;    
+0677     
+0678     <span class="keyword">if</span> ~isfield(args, <span class="string">'height'</span>)
+0679         height = each_stream_space*0.5; <span class="comment">%0.2;</span>
+0680     <span class="keyword">else</span>
+0681         height = args.height;
+0682     <span class="keyword">end</span>
+0683     <span class="keyword">if</span> isfield(args, <span class="string">'edge_color'</span>)
+0684         edge_color = args.edge_color; <span class="comment">%0.2;</span>
+0685     <span class="keyword">else</span>
+0686         edge_color = <span class="string">'none'</span>;
+0687     <span class="keyword">end</span>
+0688     
+0689     x = [x1, x2, x2, x1];
+0690     y = [y1-height, y1-height, y1+height, y1+height];
+0691 <span class="comment">%     if position_value == 3</span>
+0692 <span class="comment">%         edge_color = color;</span>
+0693 <span class="comment">%         mask_ones = color == 1;</span>
+0694 <span class="comment">%         edge_color(mask_ones) = 0.7;</span>
+0695 <span class="comment">%         rect = fill(x, y, color, 'EdgeColor', edge_color, 'LineWidth', 1);</span>
+0696 <span class="comment">%     elseif position_value == 6</span>
+0697 <span class="comment">%         edge_color = color;</span>
+0698 <span class="comment">%         mask_ones = color == 1;</span>
+0699 <span class="comment">%         edge_color(mask_ones) = 0.7;</span>
+0700 <span class="comment">%         rect = fill(x, y, color, 'EdgeColor', edge_color, 'LineWidth', 2);</span>
+0701 <span class="comment">%     else</span>
+0702 <span class="comment">%         rect = fill(x, y, color, 'EdgeColor', edge_color);</span>
+0703 <span class="comment">%     end</span>
+0704     rect = fill(x, y, color, <span class="string">'EdgeColor'</span>, edge_color);
+0705 <span class="comment">%     rect = fill(x, y, color, 'EdgeColor', 'k');</span>
+0706 <span class="keyword">end</span>
+0707 
+0708 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0709 <span class="comment">% create line</span>
+0710 <span class="comment">%</span>
+0711 <span class="comment">% vec: one chunk of cont data, [time data]</span>
+0712 <span class="comment">% row: xth row this chunk at</span>
+0713 <span class="comment">% time_ref: the 0 time spot / offset</span>
+0714 <span class="comment">%</span>
+0715 <a name="_sub3" href="#_subfunctions" class="code">function ln = create_line(vec, row, time_ref, color, args)</a>
+0716     length_of_streams = length(unique(args.stream_position));
+0717     each_stream_space = 1/length_of_streams;
+0718     
+0719     x = vec(:,1) - time_ref;
+0720     y = vec(:,2);
+0721     max_y = max(y,[],<span class="string">'omitnan'</span>);
+0722     min_y = min(y,[],<span class="string">'omitnan'</span>);
+0723     alpha = (1+each_stream_space)/(max_y - min_y);
+0724     y = (y - min_y)*alpha + (row-1)*(1+each_stream_space);
+0725     ln = line(x, y, <span class="string">'Color'</span>, color, <span class="string">'LineWidth'</span>, args.LineWidth);
+0726 <span class="keyword">end</span>
+0727 
+0728 <span class="comment">% Get test data</span>
+0729 <a name="_sub4" href="#_subfunctions" class="code">function ret = get_test_data()</a>
+0730 
+0731 ret = {
+0732         [0.1 0.2 1], [0.3 0.43 2], [0.5 0.6 3], [0.36 0.7 4], [0.7 1.0 5];
+0733         [0 0.3 1], [0.3 0.54 2], [0.5 0.6 3], [0.6 0.7 4], [0.7 1.0 5];
+0734         [0.1 0.35 1], [0.3 0.5 2], [0.5 0.6 3], [0.6 0.7 4], [0.7 1.0 5];
+0735         [0.1 0.2 1], [0.2 0.4 2], [0.5 0.6 3], [0.6 0.7 4], [0.7 1.0 5];
+0736         [0 0.23 1], [0.3 0.4 2], [0.5 0.6 3], [0.6 0.7 4], [0.7 1.0 5];
+0737         [0.13 0.21 1], [0.35 0.5 2], [0.5 0.65 3], [0.6 0.7 4], [0.7 1.0 5];
+0738         [0.1 0.3 1], [0.3 0.4 2], [0.5 0.6 3], [0.6 0.79 4], [0.7 1.0 5];
+0739         [0.1 0.32 1], [0.3 0.5 2], [0.5 0.6 3], [0.6 0.7 4], [0.7 1.0 5];
+0740     };
+0741 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

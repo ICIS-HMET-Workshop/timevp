@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of demo_timevp_stream_event_conversion</title>
+  <meta name="keywords" content="demo_timevp_stream_event_conversion">
+  <meta name="description" content="Converts stream data to event data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="index.html">timevp-main</a> &gt; demo_timevp_stream_event_conversion.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>demo_timevp_stream_event_conversion
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Converts stream data to event data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function demo_timevp_stream_event_conversion(demo_id) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Converts stream data to event data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ Warning: Before use, set dataset location and sample rate in
+ timevp_config_dataset_info.m
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="timevp_config_dataset_info.html" class="code" title="function [sample_rate, dir_dataset] = timevp_config_dataset_info()">timevp_config_dataset_info</a>	File for adjusting sampling rate and dataset directory for new data</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function demo_timevp_stream_event_conversion(demo_id)</a>
+0002 <span class="comment">% Converts stream data to event data</span>
+0003 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0004 <span class="comment">% Warning: Before use, set dataset location and sample rate in</span>
+0005 <span class="comment">% timevp_config_dataset_info.m</span>
+0006 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0007 
+0008 addpath(<span class="string">'timevp_lib'</span>)
+0009 
+0010 <span class="keyword">if</span> demo_id == 1
+0011     <span class="comment">%% Use subject id and variable name</span>
+0012     subject_id = 1203;
+0013     var_name_events = <span class="string">'cevent_eye_roi_child'</span>;
+0014     data_events = get_variable_data(subject_id, var_name_events);
+0015     
+0016     <span class="comment">% use default parameter settings</span>
+0017     data_stream = event2stream(data_events);
+0018 
+0019     <span class="comment">% specify all parameters</span>
+0020     sample_rate = <a href="timevp_config_dataset_info.html" class="code" title="function [sample_rate, dir_dataset] = timevp_config_dataset_info()">timevp_config_dataset_info</a>();
+0021     default_value = 0;
+0022     start_time = 30;
+0023     end_time = 750;
+0024     data_stream2 = event2stream(data_events, sample_rate, default_value, start_time, end_time);
+0025 
+0026     var_name_stream = <span class="string">'cstream_eye_roi_child'</span>;
+0027     <span class="comment">% save_variable_data(subject_id, var_name_stream, data_stream2)</span>
+0028 
+0029 <span class="keyword">elseif</span> demo_id == 2
+0030     <span class="comment">%% Use full csv file names.</span>
+0031     csv_stream = <span class="string">'yulab_data\7007\cstream_eye_roi_child.csv'</span>;
+0032     data_stream = csv2stream(csv_stream);
+0033 
+0034     <span class="comment">% use default parameter settings</span>
+0035     data_events = stream2event(data_stream);
+0036 
+0037     <span class="comment">% specify all parameters</span>
+0038     sample_rate = <a href="timevp_config_dataset_info.html" class="code" title="function [sample_rate, dir_dataset] = timevp_config_dataset_info()">timevp_config_dataset_info</a>();
+0039     include_zero = false;
+0040     data_events2 = stream2event(data_stream, sample_rate, include_zero);
+0041 
+0042     csv_events = <span class="string">'yulab_data\7007\cevent_eye_roi_child_new.csv'</span>;
+0043     <span class="comment">% write2csv(data_events, csv_events)</span>
+0044 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

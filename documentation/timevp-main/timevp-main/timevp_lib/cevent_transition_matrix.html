@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of cevent_transition_matrix</title>
+  <meta name="keywords" content="cevent_transition_matrix">
+  <meta name="description" content="Generate a transition matrix of the input cevent.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; cevent_transition_matrix.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>cevent_transition_matrix
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Generate a transition matrix of the input cevent.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function matrix = cevent_transition_matrix(cevent, max_gap, category_num) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  Generate a transition matrix of the input cevent.
+
+ matrix =  cevent_transition_matrix(cevent, max_gap);
+    matrix:   the transition matrix, where matrix(i, j) is the count of 
+                the transitions between cevent value i to cevent value j.
+    cevent:   cevent data
+    max_gap:  the maximum gap (in second) between two intervals that will be
+              counted as a transition. The default value of &quot;max_gap&quot; is Inf.
+    category_num: The number of category for this cevent. The default
+                  is the largest event value found in the input &quot;cevent&quot;.
+ Example :
+ &gt; cevent_data = [69.0280   69.9450    1.0000;
+                72.5080   73.8050     4.0000;
+                75.4820   87.1540     1.0000;
+                91.3940  104.1530     4.0000;
+                108.3860  111.1130    4.0000;
+                103.1310  121.1620    1.0000;
+                122.7510  123.5740    1.0000;                      
+                150.0210  153.8760    4.0000;
+                154.0310  155.9760    1.0000]
+ 
+ &gt; matrix =  cevent_transition_matrix(cevent_data)
+ 
+ matrix =
+ 
+      1     0     0     3
+      0     0     0     0
+      0     0     0     0
+      3     0     0     1
+ 
+ &gt; matrix =  cevent_transition_matrix(cevent_data, 5)
+  
+ matrix =
+ 
+      1     0     0     2
+      0     0     0     0
+      0     0     0     0
+      3     0     0     1
+  
+ &gt; matrix =  cevent_transition_matrix(cevent_data,5, 6)
+ 
+ matrix =
+ 
+      1     0     0     2     0     0
+      0     0     0     0     0     0
+      0     0     0     0     0     0
+      3     0     0     1     0     0
+      0     0     0     0     0     0
+      0     0     0     0     0     0</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="event_cal_stats.html" class="code" title="function results = event_cal_stats(chunks, args)">event_cal_stats</a>	Report various stypes of statistics of event data</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function matrix = cevent_transition_matrix(cevent, max_gap, category_num)</a>
+0002 <span class="comment">%  Generate a transition matrix of the input cevent.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% matrix =  cevent_transition_matrix(cevent, max_gap);</span>
+0005 <span class="comment">%    matrix:   the transition matrix, where matrix(i, j) is the count of</span>
+0006 <span class="comment">%                the transitions between cevent value i to cevent value j.</span>
+0007 <span class="comment">%    cevent:   cevent data</span>
+0008 <span class="comment">%    max_gap:  the maximum gap (in second) between two intervals that will be</span>
+0009 <span class="comment">%              counted as a transition. The default value of &quot;max_gap&quot; is Inf.</span>
+0010 <span class="comment">%    category_num: The number of category for this cevent. The default</span>
+0011 <span class="comment">%                  is the largest event value found in the input &quot;cevent&quot;.</span>
+0012 <span class="comment">% Example :</span>
+0013 <span class="comment">% &gt; cevent_data = [69.0280   69.9450    1.0000;</span>
+0014 <span class="comment">%                72.5080   73.8050     4.0000;</span>
+0015 <span class="comment">%                75.4820   87.1540     1.0000;</span>
+0016 <span class="comment">%                91.3940  104.1530     4.0000;</span>
+0017 <span class="comment">%                108.3860  111.1130    4.0000;</span>
+0018 <span class="comment">%                103.1310  121.1620    1.0000;</span>
+0019 <span class="comment">%                122.7510  123.5740    1.0000;</span>
+0020 <span class="comment">%                150.0210  153.8760    4.0000;</span>
+0021 <span class="comment">%                154.0310  155.9760    1.0000]</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% &gt; matrix =  cevent_transition_matrix(cevent_data)</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% matrix =</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%      1     0     0     3</span>
+0028 <span class="comment">%      0     0     0     0</span>
+0029 <span class="comment">%      0     0     0     0</span>
+0030 <span class="comment">%      3     0     0     1</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">% &gt; matrix =  cevent_transition_matrix(cevent_data, 5)</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">% matrix =</span>
+0035 <span class="comment">%</span>
+0036 <span class="comment">%      1     0     0     2</span>
+0037 <span class="comment">%      0     0     0     0</span>
+0038 <span class="comment">%      0     0     0     0</span>
+0039 <span class="comment">%      3     0     0     1</span>
+0040 <span class="comment">%</span>
+0041 <span class="comment">% &gt; matrix =  cevent_transition_matrix(cevent_data,5, 6)</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">% matrix =</span>
+0044 <span class="comment">%</span>
+0045 <span class="comment">%      1     0     0     2     0     0</span>
+0046 <span class="comment">%      0     0     0     0     0     0</span>
+0047 <span class="comment">%      0     0     0     0     0     0</span>
+0048 <span class="comment">%      3     0     0     1     0     0</span>
+0049 <span class="comment">%      0     0     0     0     0     0</span>
+0050 <span class="comment">%      0     0     0     0     0     0</span>
+0051 <span class="comment">%</span>
+0052 
+0053 <span class="keyword">if</span> ~exist(<span class="string">'max_gap'</span>, <span class="string">'var'</span>)
+0054     max_gap = Inf;
+0055 <span class="keyword">end</span>
+0056 data = cevent(:,3);
+0057 
+0058 <span class="keyword">if</span> ~exist(<span class="string">'category_num'</span>, <span class="string">'var'</span>)
+0059     category_num = max(data);
+0060 <span class="keyword">end</span>
+0061 
+0062 matrix = zeros(category_num, category_num);
+0063 <span class="keyword">for</span> i=2:length(data)
+0064     <span class="keyword">if</span> cevent(i, 1) - cevent(i-1, 2) &lt;= max_gap  <span class="comment">% The gap between two events shouldn't be larger than max_gap</span>
+0065         matrix(data(i-1),data(i)) = matrix(data(i-1),data(i)) + 1;
+0066     <span class="keyword">end</span>
+0067 <span class="keyword">end</span>
+0068 
+0069 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

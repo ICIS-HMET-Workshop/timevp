@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of temporal_profile_save_csv_plot</title>
+  <meta name="keywords" content="temporal_profile_save_csv_plot">
+  <meta name="description" content="Save temporal profile to csv">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; temporal_profile_save_csv_plot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>temporal_profile_save_csv_plot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Save temporal profile to csv</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function temporal_profile_save_csv_plot(profile_data, save_dir) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Save temporal profile to csv</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="cell2csv.html" class="code" title="function cell2csv(filename,cellArray,delimiter)">cell2csv</a>	Writes cell array content into a *.csv file.</li><li><a href="no_underline.html" class="code" title="function result = no_underline(var_name)">no_underline</a>	Remove underlines from data</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function temporal_profile_save_csv_plot(profile_data, save_dir)</a>
+0002 
+0003 <span class="comment">% Save temporal profile to csv</span>
+0004 <span class="keyword">if</span> nargin &lt; 2
+0005     save_dir = <span class="string">'.'</span>;
+0006 <span class="keyword">end</span>
+0007 
+0008 segment_event = profile_data.segment_event;
+0009 var_name = profile_data.variable_name;
+0010 
+0011 <span class="keyword">if</span> iscell(var_name)
+0012     example_var_name = var_name{1};
+0013     is_var_cell = true;
+0014     num_vars = length(var_name);
+0015 <span class="keyword">else</span>
+0016     example_var_name = var_name;
+0017     is_var_cell = false; <span class="comment">% meaning the profile_data variable only has one cstream</span>
+0018     num_vars = 1;
+0019 <span class="keyword">end</span>
+0020 
+0021 str_module_event = segment_event;
+0022 str_module_var = example_var_name;
+0023 
+0024 time_base = profile_data.time_base;
+0025 num_groupids = length(profile_data.group_list);
+0026 
+0027 csv_header = {<span class="string">'sub ID'</span>, <span class="string">'onset'</span>, <span class="string">'offset'</span>, <span class="string">'category'</span>, <span class="string">'instance ID'</span>};
+0028  csv_header_group = cell(1, num_groupids);
+0029  <span class="keyword">if</span> isfield(profile_data, <span class="string">'groupid_label'</span>)
+0030      csv_header_group = profile_data.groupid_label;
+0031  <span class="keyword">else</span>
+0032      <span class="keyword">for</span> cgidx = 1:num_groupids
+0033          csv_header_group{cgidx} = [<span class="string">'group#'</span> num2str(profile_data.group_list(cgidx))];
+0034      <span class="keyword">end</span>
+0035  <span class="keyword">end</span>
+0036  figure_legend = csv_header_group;
+0037  length_time = length(time_base);
+0038  length_profile_chunk = length_time*num_groupids;
+0039 
+0040 csv_len_header = length(csv_header);
+0041 csv_column_profile = csv_len_header+num_groupids;
+0042 
+0043 csv_header_row = cell(4, length_profile_chunk+csv_column_profile);
+0044 mask_fill =cellfun(<span class="string">'isempty'</span>, csv_header_row);
+0045 csv_header_row(mask_fill) = {<span class="string">' '</span>};
+0046 csv_header_row{1, 3} = segment_event;
+0047 
+0048 csv_column_var = csv_len_header+1;
+0049 str_probs_mean = sprintf(<span class="string">'probabilities of %s'</span>, str_module_var);
+0050 
+0051 <span class="keyword">if</span> is_var_cell
+0052     csv_header_row(1, csv_column_var:csv_column_var+num_vars-1) = var_name;
+0053 <span class="keyword">else</span>
+0054     csv_header_row{1, csv_column_var} = var_name;
+0055 <span class="keyword">end</span>
+0056 
+0057 csv_header_row{3, csv_column_var} = [str_probs_mean <span class="string">' per instance'</span>];
+0058 tmp_idx = csv_column_profile+1;
+0059 <span class="keyword">for</span> gidx = 1:num_groupids
+0060     csv_header_row{3, tmp_idx+length_time*(gidx-1)} = [<span class="string">'temporal profile of '</span> str_probs_mean <span class="string">' of '</span> figure_legend{gidx}];
+0061 <span class="keyword">end</span>
+0062 csv_header_row(4, 1:length(csv_header)) = csv_header;
+0063 csv_header_row(4, length(csv_header)+1:csv_column_profile) = csv_header_group;
+0064 csv_header_row(4, csv_column_profile+1:end) = num2cell(repmat(time_base, 1, num_groupids));
+0065 
+0066 csv_chunks = horzcat(profile_data.profile_data_mat{:});
+0067 
+0068 <span class="comment">% subID    expID    onset    offset    categories    instanceID</span>
+0069 csv_data_sub = [profile_data.sub_list profile_data.events <span class="keyword">...</span>
+0070     profile_data.event_instanceid <span class="keyword">...</span>
+0071     profile_data.probs_mean_per_instance csv_chunks];
+0072 
+0073 result_csv_name_start = sprintf(<span class="string">'temporal_profile_of_%s_group_by_%s'</span>, str_module_var, str_module_event);
+0074 
+0075 <span class="comment">% cstream_results = cstream_cal_stats(csv_chunks, profile_data, 1);</span>
+0076 <span class="comment">% cstream_count = cstream_results.temporal_count</span>
+0077 <span class="comment">%%%% start plotting, one line per subject</span>
+0078 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0079 <span class="comment">% start plotting</span>
+0080 <span class="comment">% profile_data.figure_legend = {'target', 'non-target', 'face'};</span>
+0081 <span class="comment">% profile_data.xlabel = str_module_event;</span>
+0082 <span class="comment">% profile_data.ylabel = str_module_var;</span>
+0083 <span class="comment">% profile_data.xlim = [profile_data.interval(1) profile_data.interval(2)-1];</span>
+0084 vert_line = [0];
+0085 sub_list = unique(profile_data.sub_list);
+0086 
+0087 <span class="comment">% profile_line_sub = nan(length(sub_list), length_time);</span>
+0088 
+0089 colormap = {[0 0 1]; [1 0 1]; [1 0 0]; [0 1 1]; [0 1 0]; [1 1 0]; <span class="keyword">...</span>
+0090     [0 0 0]; [0 0 0.7]; [0.7 0 0.7]; [0 0.7 0.7]; [0.7 0 0]; [0 0.7 0]};
+0091 
+0092     title_str = sprintf(<span class="string">'%s'</span>, result_csv_name_start);
+0093     max_y = 0;
+0094     h = figure(<span class="string">'Position'</span>, [50 50 1200 900], <span class="string">'Visible'</span>, <span class="string">'off'</span>);
+0095     hold on;
+0096 
+0097     <span class="keyword">for</span> gidx = 1:num_groupids
+0098         profile_mat = profile_data.profile_data_mat{gidx};
+0099 
+0100 <span class="comment">%         if strcmp(str_var_type, 'cont')</span>
+0101 <span class="comment">%             profile_line_plot = nanmean(profile_mat, 1);</span>
+0102 <span class="comment">%         else</span>
+0103             num_valid_data = sum(~isnan(profile_mat), 1);
+0104             num_matches = sum(profile_mat &gt; 0 &amp; profile_mat &lt; 2, 1);
+0105             profile_line_plot = num_matches ./ num_valid_data;
+0106 <span class="comment">%         end</span>
+0107 
+0108         plot(time_base, profile_line_plot, <span class="string">'Color'</span>, colormap{gidx});
+0109         
+0110         max_y = max(max(profile_line_plot,[],<span class="string">'omitnan'</span>),max_y,<span class="string">'omitnan'</span>);
+0111     <span class="keyword">end</span>
+0112 
+0113     hold off;
+0114     legend(figure_legend, <span class="string">'Location'</span>, <span class="string">'bestoutside'</span>);
+0115     title(<a href="no_underline.html" class="code" title="function result = no_underline(var_name)">no_underline</a>(title_str));
+0116     <span class="comment">% xlim([profile_data.interval(1) profile_data.interval(2)-1]);</span>
+0117     ylim([0 max_y+0.005]);
+0118 <span class="comment">%</span>
+0119 <span class="comment">%     for vidx = 1:length(vert_line)</span>
+0120 <span class="comment">%         x = [vert_line(vidx), vert_line(vidx), vert_line(vidx)+0.01, vert_line(vidx)+0.01];</span>
+0121 <span class="comment">%         y = [0, max_y, max_y, 0];</span>
+0122 <span class="comment">%         color = [1 0 0];</span>
+0123 <span class="comment">%         fill(x, y, 'r', 'EdgeColor', color);</span>
+0124 <span class="comment">%     end</span>
+0125 
+0126     saveas(h, fullfile(save_dir, [title_str <span class="string">'.png'</span>]));
+0127     close(h);
+0128 
+0129 <span class="comment">% saving the data using cell2csv function, extremely slow...</span>
+0130 csv_save_path = fullfile(save_dir, sprintf(<span class="string">'%s.csv'</span>, result_csv_name_start));
+0131 <a href="cell2csv.html" class="code" title="function cell2csv(filename,cellArray,delimiter)">cell2csv</a>(csv_save_path, [csv_header_row; num2cell(csv_data_sub)]);
+0132 fprintf(<span class="string">'Profile results saved under %s\n'</span>, csv_save_path);
+0133</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

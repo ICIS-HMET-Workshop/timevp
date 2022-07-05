@@ -1,0 +1,503 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of event_cal_stats</title>
+  <meta name="keywords" content="event_cal_stats">
+  <meta name="description" content="Report various stypes of statistics of event data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; event_cal_stats.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>event_cal_stats
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Report various stypes of statistics of event data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function results = event_cal_stats(chunks, args) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Report various stypes of statistics of event data
+chunks according to user args.
+ 
+ For examples and usage, go to: 
+ demo_timevp_compute_statistics.m</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="cevent_remove_long_segments.html" class="code" title="function [res] = cevent_remove_long_segments(cevent, maxDuration)">cevent_remove_long_segments</a>	Deletes event intervals that are too long</li><li><a href="cevent_remove_small_segments.html" class="code" title="function [res] = cevent_remove_small_segments(cevent, minDuration)">cevent_remove_small_segments</a>	Deletes event intervals that are too small</li><li><a href="cevent_transition_matrix.html" class="code" title="function matrix = cevent_transition_matrix(cevent, max_gap, category_num)">cevent_transition_matrix</a>	Generate a transition matrix of the input cevent.</li><li><a href="event_average_dur.html" class="code" title="function [dur] = event_average_dur(cevent)">event_average_dur</a>	Finds the average length of an event (or cevent)</li><li><a href="event_category_equals.html" class="code" title="function out = event_category_equals(events, categories)">event_category_equals</a>	Makes a cevent variable with only some of the instances in the input cevent</li><li><a href="event_median_dur.html" class="code" title="function [dur] = event_median_dur(cevent)">event_median_dur</a>	Finds the median length of an event (or cevent)</li><li><a href="event_number.html" class="code" title="function e_num = event_number(event)">event_number</a>	Counts the number of occurrences of the given event</li><li><a href="event_number_switches.html" class="code" title="function [results, switch_mask] = cevent_number_switches(cevents, categories)">event_number_switches</a>	This function calculates the number of switches between different</li><li><a href="event_total_length.html" class="code" title="function t_len = event_total_length(events)">event_total_length</a>	Return the sum of the durations of all the periods</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="stream_cal_stats.html" class="code" title="function results = stream_cal_stats(chunks, args)">stream_cal_stats</a>	Report various stypes of statistics of stream type data</li><li><a href="timevp_compute_statistics.html" class="code" title="function result_stats = timevp_compute_statistics(variable_name, subject_list, args)">timevp_compute_statistics</a>	Computes event distribution statistics of provided time series data</li><li><a href="timevp_extract_measures.html" class="code" title="function timevp_extract_measures(subject_list, variable_list, segment_event, save_filename, args)">timevp_extract_measures</a>	Function used for extracting variable measures during</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function results = event_cal_stats(chunks, args)</a>
+0002 <span class="comment">% Report various stypes of statistics of event data</span>
+0003 <span class="comment">%chunks according to user args.</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% For examples and usage, go to:</span>
+0006 <span class="comment">% demo_timevp_compute_statistics.m</span>
+0007 
+0008 
+0009 <span class="keyword">if</span> isempty(chunks)
+0010     warning(<span class="string">'The args CHUNKS is empty, there is no data inside, the function will return now'</span>);
+0011     results = [];
+0012     <span class="keyword">return</span>
+0013 <span class="keyword">end</span>
+0014 
+0015 <span class="comment">% check fileds in 'args'</span>
+0016 <span class="keyword">if</span> ~exist(<span class="string">'args'</span>, <span class="string">'var'</span>)
+0017     <span class="comment">% this line of code is just to prevent from generating errors when</span>
+0018     <span class="comment">% script checks whether a certain field exists.</span>
+0019     args.none_filed = <span class="string">'No information here'</span>;
+0020 <span class="keyword">end</span>
+0021 
+0022 <span class="keyword">if</span> isfield(args, <span class="string">'sub_list'</span>)
+0023     results.sub_list = args.sub_list;
+0024 <span class="keyword">end</span>
+0025 
+0026 <span class="keyword">if</span> isfield(args, <span class="string">'grouping'</span>)
+0027     grouping = args.grouping;
+0028 <span class="keyword">else</span>
+0029     grouping = <span class="string">''</span>;
+0030 <span class="keyword">end</span>
+0031 
+0032 <span class="comment">% If user only wants to calculate stats for events that fall within a</span>
+0033 <span class="comment">% specified duration range</span>
+0034 <span class="keyword">if</span> isfield(args, <span class="string">'min_dur_thresh'</span>)
+0035     <span class="keyword">for</span> cidx = 1:length(chunks)
+0036         chunk_one = chunks{cidx};
+0037         <span class="keyword">if</span> size(chunk_one, 1) &gt; 0
+0038             chunk_one = <a href="cevent_remove_small_segments.html" class="code" title="function [res] = cevent_remove_small_segments(cevent, minDuration)">cevent_remove_small_segments</a>(<span class="keyword">...</span>
+0039                 chunk_one, args.min_dur_thresh);
+0040         <span class="keyword">end</span>
+0041         chunks{cidx} = chunk_one;
+0042     <span class="keyword">end</span>
+0043 <span class="keyword">end</span>
+0044 
+0045 <span class="keyword">if</span> isfield(args, <span class="string">'max_dur_thresh'</span>) 
+0046     <span class="keyword">for</span> cidx = 1:length(chunks)
+0047         chunk_one = chunks{cidx};
+0048         <span class="keyword">if</span> size(chunk_one, 1) &gt; 0
+0049             chunk_one = <a href="cevent_remove_long_segments.html" class="code" title="function [res] = cevent_remove_long_segments(cevent, maxDuration)">cevent_remove_long_segments</a>(<span class="keyword">...</span>
+0050                 chunk_one, args.max_dur_thresh);
+0051         <span class="keyword">end</span>
+0052         chunks{cidx} = chunk_one;
+0053     <span class="keyword">end</span>
+0054 <span class="keyword">end</span>
+0055 
+0056 cat_chunks = cat(1,chunks{:});
+0057 
+0058 <span class="keyword">if</span> isfield(args, <span class="string">'categories'</span>)
+0059     categories = args.categories;
+0060     categories = categories(~isnan(categories));
+0061     results.categories = categories;
+0062 <span class="keyword">else</span>
+0063     categories = unique(cat_chunks(:,3))';
+0064     categories = categories(~isnan(categories));
+0065     <span class="keyword">if</span> isfield(args, <span class="string">'nodata_marker'</span>)
+0066         categories = categories(~ismember(categories, args.nodata_marker));
+0067     <span class="keyword">end</span>
+0068     results.categories = categories;
+0069 <span class="keyword">end</span>
+0070 
+0071 <span class="keyword">if</span> all(cellfun(@isempty, chunks))
+0072     max_category = 1;
+0073 <span class="keyword">else</span>
+0074     max_category = max(max(cat_chunks(:,3)), max(categories));
+0075 <span class="keyword">end</span>
+0076 
+0077 <span class="comment">% the calculation of individual_range_dur should be done</span>
+0078 <span class="comment">% in the step of extracting data</span>
+0079 <span class="keyword">if</span> isfield(args, <span class="string">'individual_ranges'</span>)
+0080     args.individual_range_dur = args.individual_ranges(:,2) - args.individual_ranges(:,1);
+0081 <span class="keyword">end</span>
+0082 
+0083 <span class="keyword">if</span> isfield(args, <span class="string">'individual_range_dur'</span>)
+0084     individual_range_dur = args.individual_range_dur;
+0085     
+0086     <span class="keyword">if</span> size(individual_range_dur, 1) == 1
+0087         individual_range_dur = repmat(individual_range_dur, <span class="keyword">...</span>
+0088             length(chunks), 1);
+0089         args.individual_range_dur = individual_range_dur;
+0090     <span class="keyword">elseif</span> length(chunks) ~= length(individual_range_dur)
+0091         warning([<span class="string">'Warning: the length of data chunks and the length '</span> <span class="keyword">...</span>
+0092             <span class="string">'of individual_range_dur are not the same, therefore, '</span> <span class="keyword">...</span>
+0093             <span class="string">'args.individual_range_dur will be discarded.'</span>]);
+0094         args = rmfield(args, <span class="string">'individual_range_dur'</span>);
+0095     <span class="keyword">end</span>
+0096 <span class="keyword">elseif</span> strcmp(grouping, <span class="string">'subject'</span>) &amp;&amp; isfield(args, <span class="string">'sub_list'</span>) <span class="keyword">...</span>
+0097         &amp;&amp; length(chunks) == length(args.sub_list)
+0098     chunks_trial_time = arrayfun(@(sub_id) <span class="keyword">...</span>
+0099         <a href="event_total_length.html" class="code" title="function t_len = event_total_length(events)">event_total_length</a>(get_trial_times(sub_id)), <span class="keyword">...</span>
+0100         args.sub_list, <span class="keyword">...</span>
+0101         <span class="string">'UniformOutput'</span>, false);
+0102     individual_range_dur = vertcat(chunks_trial_time{:});
+0103     args.individual_range_dur = individual_range_dur;
+0104 <span class="keyword">elseif</span> strcmp(grouping, <span class="string">'trial_cat'</span>) &amp;&amp; isfield(args, <span class="string">'sub_list'</span>) <span class="keyword">...</span>
+0105         &amp;&amp; length(chunks) == length(args.sub_list)
+0106     chunks_trial_time = arrayfun(@(sub_id) <span class="keyword">...</span>
+0107         <a href="event_total_length.html" class="code" title="function t_len = event_total_length(events)">event_total_length</a>(get_trial_times(sub_id)), <span class="keyword">...</span>
+0108         args.sub_list, <span class="keyword">...</span>
+0109         <span class="string">'UniformOutput'</span>, false);
+0110     individual_range_dur = vertcat(chunks_trial_time{:});
+0111     args.individual_range_dur = individual_range_dur;
+0112 <span class="keyword">elseif</span> strcmp(grouping, <span class="string">'trial'</span>) &amp;&amp; isfield(args, <span class="string">'sub_list'</span>) <span class="keyword">...</span>
+0113         &amp;&amp; (~isfield(args, <span class="string">'trial_indices'</span>) &amp;&amp; ~isfield(args, <span class="string">'trial_var_name'</span>))
+0114     chunks_trial_time = arrayfun(@(sub_id) <span class="keyword">...</span>
+0115         get_trial_times(sub_id), <span class="keyword">...</span>
+0116         args.sub_list, <span class="keyword">...</span>
+0117         <span class="string">'UniformOutput'</span>, false);
+0118     individual_range_dur = vertcat(chunks_trial_time{:});
+0119     individual_range_dur = individual_range_dur(:,2)-individual_range_dur(:,1);
+0120     <span class="keyword">if</span> length(individual_range_dur) == length(chunks)
+0121         args.individual_range_dur = individual_range_dur;
+0122     <span class="keyword">else</span>
+0123         disp([<span class="string">'If chunks are extracted based on selective trials, '</span> <span class="keyword">...</span>
+0124             <span class="string">'either the field trial_indices or trial_var_name has to be set'</span>]);
+0125     <span class="keyword">end</span>
+0126 <span class="keyword">elseif</span> strcmp(grouping, <span class="string">'trial'</span>) &amp;&amp; isfield(args, <span class="string">'sub_list'</span>) <span class="keyword">...</span>
+0127         &amp;&amp; isfield(args, <span class="string">'trial_indices'</span>) &amp;&amp; ~isfield(args, <span class="string">'trial_var_name'</span>)
+0128     sub_list = args.sub_list;
+0129     individual_range_dur = [];
+0130     
+0131     <span class="keyword">for</span> sidx = 1:length(sub_list)
+0132         sub_id = sub_list(sidx);
+0133         <span class="keyword">if</span> iscell(args.trial_indices)
+0134             trial_indices_one = args.trial_indices{sidx};
+0135         <span class="keyword">else</span>
+0136             trial_indices_one = args.trial_indices;
+0137         <span class="keyword">end</span>
+0138         trial_times_one = get_trial_times(sub_id, trial_indices_one);
+0139         trial_times_one = trial_times_one(:,2)-trial_times_one(:,1);
+0140         individual_range_dur = [individual_range_dur; trial_times_one];
+0141     <span class="keyword">end</span>
+0142     args.individual_range_dur = individual_range_dur;
+0143 <span class="keyword">elseif</span> strcmp(grouping, <span class="string">'trial'</span>) &amp;&amp; isfield(args, <span class="string">'sub_list'</span>) <span class="keyword">...</span>
+0144         &amp;&amp; ~isfield(args, <span class="string">'trial_indices'</span>) &amp;&amp; isfield(args, <span class="string">'trial_var_name'</span>)
+0145     sub_list = args.sub_list;
+0146     individual_range_dur = [];
+0147     
+0148     <span class="keyword">for</span> sidx = 1:length(sub_list)
+0149         sub_id = sub_list(sidx);
+0150         <span class="keyword">if</span> iscell(args.trial_indices)
+0151             trial_indices_one = args.trial_indices{sidx};
+0152         <span class="keyword">else</span>
+0153             trial_indices_one = args.trial_indices;
+0154         <span class="keyword">end</span>
+0155         trial_times_one = get_trial_times(sub_id, trial_indices_one);
+0156         trial_times_one = trial_times_one(:,2)-trial_times_one(:,1);
+0157         individual_range_dur = [individual_range_dur; trial_times_one];
+0158     <span class="keyword">end</span>
+0159     args.individual_range_dur = individual_range_dur;
+0160 <span class="keyword">end</span>
+0161 
+0162 <span class="comment">%% calculate statistics</span>
+0163 cat_chunks_by_cat = arrayfun(@(category_one) <span class="keyword">...</span>
+0164     <a href="event_category_equals.html" class="code" title="function out = event_category_equals(events, categories)">event_category_equals</a>(cat_chunks, category_one), <span class="keyword">...</span>
+0165     categories, <span class="keyword">...</span>
+0166     <span class="string">'UniformOutput'</span>, false);
+0167 
+0168 cat_chunks = <a href="event_category_equals.html" class="code" title="function out = event_category_equals(events, categories)">event_category_equals</a>(cat_chunks, categories);
+0169 cat_durations = cat_chunks(:,2) - cat_chunks(:,1);
+0170 
+0171 <span class="keyword">if</span> sum(ismember([0 NaN], unique(cat_chunks(:,3)))) &gt; 0
+0172     warning([<span class="string">'This event variable contains category value 0, '</span> <span class="keyword">...</span>
+0173         <span class="string">'transition matrix cannot be calculated'</span>]);
+0174     has_transition_matrix = false;
+0175 <span class="keyword">else</span>
+0176     has_transition_matrix = true;
+0177 <span class="keyword">end</span>
+0178 
+0179 <span class="comment">% loop through each chunk for calculating some statistics</span>
+0180 individual_number = zeros(length(chunks), 1);
+0181 individual_number_by_cat = zeros(length(chunks), length(categories));
+0182 individual_mean_dur = nan(length(chunks), 1);
+0183 individual_std_dur = nan(length(chunks), 1);
+0184 individual_median_dur = nan(length(chunks), 1);
+0185 individual_mean_dur_by_cat = nan(length(chunks), length(categories));
+0186 individual_median_dur_by_cat = nan(length(chunks), length(categories));
+0187 <span class="comment">% individual_stats = cell(length(chunks), 1);</span>
+0188 
+0189 res_trans_matrix = zeros(length(categories), length(categories));
+0190 res_individual_trans_matrix = cell(length(chunks), 1);
+0191 res_individual_trans_freq_matrix = cell(length(chunks), 1);
+0192 
+0193 <span class="keyword">for</span> chunkidx = 1:length(chunks)
+0194     chunk_one = chunks{chunkidx};    
+0195     
+0196     <span class="keyword">if</span> ~isempty(chunk_one)
+0197         chunk_one = <a href="event_category_equals.html" class="code" title="function out = event_category_equals(events, categories)">event_category_equals</a>(chunk_one, categories);
+0198     <span class="keyword">end</span>
+0199     
+0200     <span class="keyword">if</span> isempty(chunk_one)
+0201         chunk_one = zeros(0, 3);
+0202         chunk_one_by_cat = mat2cell(repmat(zeros(0, 3), 4, 1), <span class="keyword">...</span><span class="comment">.</span>
+0203             zeros(1, 4), [3]);
+0204         res_individual_trans_matrix{chunkidx} = [];
+0205     <span class="keyword">end</span>
+0206     
+0207     <span class="keyword">for</span> catidx = 1:length(categories)
+0208         events_one = <a href="event_category_equals.html" class="code" title="function out = event_category_equals(events, categories)">event_category_equals</a>( <span class="keyword">...</span>
+0209             chunk_one, categories(catidx));
+0210         
+0211         individual_number_by_cat(chunkidx, catidx) = <span class="keyword">...</span>
+0212             <a href="event_number.html" class="code" title="function e_num = event_number(event)">event_number</a>(events_one);
+0213         individual_mean_dur_by_cat(chunkidx, catidx) = <span class="keyword">...</span>
+0214             <a href="event_average_dur.html" class="code" title="function [dur] = event_average_dur(cevent)">event_average_dur</a>(events_one);
+0215         individual_median_dur_by_cat(chunkidx, catidx) = <span class="keyword">...</span>
+0216             <a href="event_median_dur.html" class="code" title="function [dur] = event_median_dur(cevent)">event_median_dur</a>(events_one);
+0217         
+0218         chunk_one_by_cat = arrayfun(@(category_id) <span class="keyword">...</span>
+0219             <a href="event_category_equals.html" class="code" title="function out = event_category_equals(events, categories)">event_category_equals</a>(chunk_one, category_id), <span class="keyword">...</span>
+0220             categories, <span class="keyword">...</span>
+0221             <span class="string">'UniformOutput'</span>, false);
+0222     <span class="keyword">end</span>
+0223     
+0224     individual_number(chunkidx) = <a href="event_number.html" class="code" title="function e_num = event_number(event)">event_number</a>(chunk_one);
+0225     individual_mean_dur(chunkidx) = <a href="event_average_dur.html" class="code" title="function [dur] = event_average_dur(cevent)">event_average_dur</a>(chunk_one);
+0226     <span class="keyword">if</span> isempty(chunk_one)
+0227         individual_std_dur(chunkidx) = NaN;
+0228     <span class="keyword">else</span>
+0229         individual_std_dur(chunkidx) = std(chunk_one(:,2) - chunk_one(:,1));
+0230     <span class="keyword">end</span>
+0231     individual_median_dur(chunkidx) = <a href="event_median_dur.html" class="code" title="function [dur] = event_median_dur(cevent)">event_median_dur</a>(chunk_one);
+0232     
+0233     <span class="keyword">if</span> has_transition_matrix
+0234         <span class="keyword">if</span> isempty(chunk_one)
+0235             res_individual_trans_matrix{chunkidx} = <span class="keyword">...</span>
+0236                 zeros(length(categories), length(categories));
+0237             
+0238             <span class="keyword">if</span> isfield(args, <span class="string">'individual_range_dur'</span>)
+0239                 res_individual_trans_freq_matrix{chunkidx} = <span class="keyword">...</span>
+0240                     zeros(length(categories), length(categories));
+0241             <span class="keyword">end</span>
+0242 
+0243         <span class="keyword">else</span>
+0244             <span class="comment">% for calculating transition matrix for each chunk</span>
+0245             <span class="keyword">if</span> isfield(args, <span class="string">'trans_max_gap'</span>)        
+0246                 trans_matrix_one = <a href="cevent_transition_matrix.html" class="code" title="function matrix = cevent_transition_matrix(cevent, max_gap, category_num)">cevent_transition_matrix</a>(chunk_one, <span class="keyword">...</span>
+0247                     args.trans_max_gap, max_category);
+0248             <span class="keyword">else</span>
+0249                 trans_matrix_one = <a href="cevent_transition_matrix.html" class="code" title="function matrix = cevent_transition_matrix(cevent, max_gap, category_num)">cevent_transition_matrix</a>(chunk_one, <span class="keyword">...</span>
+0250                     Inf, max_category);
+0251             <span class="keyword">end</span>
+0252             
+0253             res_trans_matrix = res_trans_matrix + <span class="keyword">...</span>
+0254                 trans_matrix_one(categories, categories);
+0255 
+0256             res_individual_trans_matrix{chunkidx} = <span class="keyword">...</span>
+0257                 trans_matrix_one(categories, categories);
+0258 
+0259             <span class="keyword">if</span> isfield(args, <span class="string">'individual_range_dur'</span>)
+0260                 res_individual_trans_freq_matrix{chunkidx} = <span class="keyword">...</span>
+0261                     trans_matrix_one(categories, categories) / <span class="keyword">...</span>
+0262                     individual_range_dur(chunkidx) * 60; <span class="comment">% per minute</span>
+0263             <span class="keyword">end</span>
+0264         <span class="keyword">end</span>
+0265     <span class="keyword">end</span>
+0266     <span class="comment">% temp_indiv_stats.trans_matrix = res_individual_trans_matrix{chunkidx};</span>
+0267     <span class="comment">% individual_stats(chunkidx) = temp_indiv_stats;</span>
+0268 <span class="keyword">end</span>
+0269 
+0270 <span class="comment">% number of events</span>
+0271 <span class="comment">% total number</span>
+0272 results.total_number = <a href="event_number.html" class="code" title="function e_num = event_number(event)">event_number</a>(cat_chunks);
+0273 results.individual_number = individual_number;
+0274 <span class="comment">% number by category</span>
+0275 res_total_number_by_cat = cellfun(@<a href="event_number.html" class="code" title="function e_num = event_number(event)">event_number</a>,cat_chunks_by_cat, <span class="keyword">...</span>
+0276     <span class="string">'UniformOutput'</span>, false);
+0277 results.total_number_by_cat = horzcat(res_total_number_by_cat{:});
+0278 results.individual_number_by_cat = individual_number_by_cat;
+0279 
+0280 <span class="comment">% mean duration</span>
+0281 <span class="comment">% overal mean</span>
+0282 results.mean_dur = <a href="event_average_dur.html" class="code" title="function [dur] = event_average_dur(cevent)">event_average_dur</a>(cat_chunks);
+0283 results.individual_mean_dur = individual_mean_dur;
+0284 results.individual_std_dur = individual_std_dur;
+0285 <span class="comment">% mean by category</span>
+0286 res_mean_dur_by_cat = cellfun(@<a href="event_average_dur.html" class="code" title="function [dur] = event_average_dur(cevent)">event_average_dur</a>, cat_chunks_by_cat, <span class="keyword">...</span>
+0287     <span class="string">'UniformOutput'</span>, false);
+0288 results.mean_dur_by_cat = horzcat(res_mean_dur_by_cat{:});
+0289 results.individual_mean_dur_by_cat = individual_mean_dur_by_cat;
+0290 
+0291 <span class="comment">% median durations</span>
+0292 results.median_dur = <a href="event_median_dur.html" class="code" title="function [dur] = event_median_dur(cevent)">event_median_dur</a>(cat_chunks);
+0293 results.individual_median_dur = individual_median_dur;
+0294 res_median_dur_by_cat = cellfun(@<a href="event_median_dur.html" class="code" title="function [dur] = event_median_dur(cevent)">event_median_dur</a>, cat_chunks_by_cat, <span class="keyword">...</span>
+0295     <span class="string">'UniformOutput'</span>, false);
+0296 results.median_dur_by_cat = horzcat(res_median_dur_by_cat{:});
+0297 results.individual_median_dur_by_cat = individual_median_dur_by_cat;
+0298 
+0299 <span class="comment">% proportion and frequency are only calculated when individual trial</span>
+0300 <span class="comment">% time is included in args</span>
+0301 <span class="keyword">if</span> isfield(args, <span class="string">'individual_range_dur'</span>)
+0302     range_time_total = sum(individual_range_dur,<span class="string">'omitnan'</span>);
+0303     mean_dur_tmp = results.mean_dur;
+0304     mean_dur_tmp(isnan(mean_dur_tmp)) = 0;
+0305     mean_dur_by_cat_tmp = results.mean_dur_by_cat;
+0306     mean_dur_by_cat_tmp(isnan(mean_dur_by_cat_tmp)) = 0;
+0307     indiv_mean_dur_tmp = individual_mean_dur;
+0308     indiv_mean_dur_tmp(isnan(individual_mean_dur)) = 0;
+0309     indiv_mean_dur_by_cat_tmp = individual_mean_dur_by_cat;
+0310     indiv_mean_dur_by_cat_tmp(isnan(individual_mean_dur_by_cat)) = 0;
+0311     
+0312     <span class="comment">% proportions</span>
+0313     results.prop = mean_dur_tmp * results.total_number / range_time_total;
+0314     results.prop_by_cat = mean_dur_by_cat_tmp .* <span class="keyword">...</span>
+0315         results.total_number_by_cat / range_time_total;
+0316     results.individual_prop = (indiv_mean_dur_tmp .* <span class="keyword">...</span>
+0317         results.individual_number) ./ individual_range_dur;
+0318     results.individual_prop_by_cat = (indiv_mean_dur_by_cat_tmp .* results.individual_number_by_cat) <span class="keyword">...</span>
+0319         ./ repmat(individual_range_dur, 1, length(categories));
+0320 
+0321     <span class="comment">% mean proportions</span>
+0322     results.mean_prop = mean(results.individual_prop,<span class="string">'omitnan'</span>);
+0323     results.mean_prop_by_cat = mean(results.individual_prop_by_cat, 1,<span class="string">'omitnan'</span>);
+0324     
+0325     <span class="comment">% frequency</span>
+0326     results.freq = results.total_number / (range_time_total/60);
+0327     results.freq_by_cat = results.total_number_by_cat / (range_time_total/60);
+0328     results.individual_freq = results.individual_number ./ (individual_range_dur/60);
+0329     results.individual_freq_by_cat = results.individual_number_by_cat <span class="keyword">...</span>
+0330         ./ repmat((individual_range_dur/60), 1, length(categories));
+0331     
+0332     results.range_time_total = range_time_total;
+0333     results.individual_range_dur = individual_range_dur;
+0334 <span class="keyword">end</span>
+0335 
+0336 <span class="comment">% number of switches between categories</span>
+0337 individual_switches = cellfun(@(chunk) <span class="keyword">...</span>
+0338     <a href="event_number_switches.html" class="code" title="function [results, switch_mask] = cevent_number_switches(cevents, categories)">event_number_switches</a>(chunk, categories), <span class="keyword">...</span>
+0339     chunks, <span class="keyword">...</span>
+0340     <span class="string">'UniformOutput'</span>, false);
+0341 individual_switches = vertcat(individual_switches{:});
+0342 <span class="comment">% results.switches = nansum(individual_switches);</span>
+0343 <span class="comment">% results.individual_switches = individual_switches;</span>
+0344 <span class="keyword">if</span> isfield(args, <span class="string">'individual_range_dur'</span>)
+0345     results.switches_freq = sum(individual_switches,<span class="string">'omitnan'</span>) / (range_time_total/60);
+0346     results.individual_switches_freq = individual_switches ./ <span class="keyword">...</span>
+0347         (args.individual_range_dur/60);
+0348 <span class="keyword">else</span>
+0349     results.switches = sum(individual_switches,<span class="string">'omitnan'</span>);
+0350     results.individual_switches = individual_switches;
+0351 <span class="keyword">end</span>
+0352 
+0353 <span class="comment">% hist_bins</span>
+0354 <span class="keyword">if</span> isfield(args, <span class="string">'hist_arg'</span>)
+0355     hist_arg = args.hist_arg;
+0356 <span class="keyword">else</span>
+0357     hist_arg = <span class="string">'thresholds'</span>;
+0358 <span class="keyword">end</span>
+0359 
+0360 <span class="keyword">if</span> isfield(args, <span class="string">'hist_bins'</span>)
+0361     res_dur_hist = nan(length(chunks), length(args.hist_bins));
+0362     <span class="keyword">for</span> i = 1: length(chunks)
+0363         res_dur_hist(i,:) = event_duration_hist(chunks{i}, args.hist_bins, hist_arg);
+0364         res_dur_hist(i,:) = res_dur_hist(i,:)/sum(res_dur_hist(i,:));
+0365     <span class="keyword">end</span>
+0366        
+0367     results.dur_hist = event_duration_hist(cat_chunks, args.hist_bins, hist_arg);
+0368     results.dur_hist = results.dur_hist/sum(results.dur_hist);
+0369     results.individual_dur_hist = res_dur_hist;
+0370 <span class="keyword">end</span>
+0371 
+0372 <span class="comment">% low shreshold</span>
+0373 <span class="keyword">if</span> isfield(args, <span class="string">'low_threshold'</span>)
+0374     res_low_prop = nan(length(chunks), 1);    
+0375     <span class="keyword">for</span> i = 1: length(chunks)
+0376         durations_one = chunks{i};
+0377         durations_one = durations_one(:,2) - durations_one(:,1);
+0378         res_low_prop(i) = sum(durations_one &lt; args.low_threshold) <span class="keyword">...</span>
+0379             / length(durations_one);
+0380     <span class="keyword">end</span>
+0381     
+0382     results.dur_low_prop = sum(cat_durations &lt; args.low_threshold) <span class="keyword">...</span>
+0383         / length(cat_durations);
+0384     results.individual_dur_low_prop = res_low_prop;
+0385 <span class="keyword">end</span>
+0386 
+0387 <span class="comment">% high shreshold</span>
+0388 <span class="keyword">if</span> isfield(args, <span class="string">'high_threshold'</span>)
+0389     res_high_prop = nan(length(chunks), 1);    
+0390     <span class="keyword">for</span> i = 1: length(chunks)
+0391         durations_one = chunks{i};
+0392         durations_one = durations_one(:,2) - durations_one(:,1);
+0393         res_high_prop(i) = sum(durations_one &gt; args.high_threshold) <span class="keyword">...</span>
+0394             / length(durations_one);
+0395     <span class="keyword">end</span>
+0396     
+0397     results.dur_high_prop = sum(cat_durations &gt; args.high_threshold) <span class="keyword">...</span>
+0398         / length(cat_durations);
+0399     results.individual_dur_high_prop = res_high_prop;
+0400 <span class="keyword">end</span>
+0401 
+0402 <span class="comment">% add transition matrix to results</span>
+0403 <span class="keyword">if</span> has_transition_matrix
+0404     results.trans_matrix = res_trans_matrix;
+0405 <span class="comment">%     results.individual_trans_matrix_cell = res_individual_trans_matrix;</span>
+0406     
+0407     size_trans_matrix = size(res_trans_matrix, 1);
+0408     res_tmp_mat_frow = cell(1, size_trans_matrix*size_trans_matrix);
+0409     
+0410     <span class="keyword">for</span> cfidx = 1:length(categories)
+0411         first_num = categories(cfidx);
+0412         
+0413         <span class="keyword">for</span> csidx = 1:length(categories)
+0414             second_num = categories(csidx);
+0415             tmp_str = sprintf(<span class="string">'%dto%d'</span>, first_num, second_num);
+0416             res_tmp_mat_frow{1,(cfidx-1)*length(categories)+csidx} <span class="keyword">...</span>
+0417                 = tmp_str;
+0418         <span class="keyword">end</span>
+0419     <span class="keyword">end</span>
+0420     
+0421     res_tmp_mat = zeros(length(chunks), <span class="keyword">...</span>
+0422         size_trans_matrix*size_trans_matrix);
+0423     
+0424     <span class="keyword">for</span> cidx = 1:length(chunks)
+0425         tmp_mat = res_individual_trans_matrix{cidx};
+0426         tmp_mat = tmp_mat';
+0427         res_tmp_mat(cidx,:) = tmp_mat(:)';
+0428     <span class="keyword">end</span>
+0429     
+0430     results.individual_trans_matrix = <span class="keyword">...</span>
+0431         vertcat(res_tmp_mat_frow, num2cell(res_tmp_mat));
+0432     
+0433     <span class="keyword">if</span> isfield(args, <span class="string">'individual_range_dur'</span>)
+0434         res_trans_matrix = res_trans_matrix / (range_time_total/60);
+0435     <span class="keyword">end</span>
+0436     results.trans_freq_matrix = res_trans_matrix;
+0437     <span class="keyword">if</span> isfield(args, <span class="string">'individual_range_dur'</span>)
+0438         res_tmp_mat = nan(length(chunks), <span class="keyword">...</span>
+0439             size_trans_matrix*size_trans_matrix);
+0440 
+0441         <span class="keyword">for</span> cidx = 1:length(chunks)
+0442             tmp_mat = res_individual_trans_freq_matrix{cidx};
+0443             res_tmp_mat(cidx,:) = tmp_mat(:)';
+0444         <span class="keyword">end</span>
+0445 
+0446         results.individual_trans_freq_matrix = <span class="keyword">...</span>
+0447             vertcat(res_tmp_mat_frow, num2cell(res_tmp_mat));
+0448     <span class="keyword">end</span>
+0449 <span class="keyword">end</span>
+0450     
+0451 
+0452 <span class="comment">%% adding the code to replace props and frquency with zeros</span></pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

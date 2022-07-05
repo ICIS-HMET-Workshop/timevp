@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of struct2csv</title>
+  <meta name="keywords" content="struct2csv">
+  <meta name="description" content="Converts a structure of cell arays to a provided csv file">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">timevp-main</a> &gt; <a href="../index.html">timevp-main</a> &gt; <a href="index.html">timevp_lib</a> &gt; struct2csv.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for timevp-main\timevp-main\timevp_lib&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>struct2csv
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Converts a structure of cell arays to a provided csv file</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function struct2csv(s,fn) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Converts a structure of cell arays to a provided csv file
+ STRUCT2CSV(s,fn)
+
+ Output a structure to a comma delimited file with column headers
+
+       s : any structure composed of one or more matrices and cell arrays
+      fn : file name
+
+      Given s:
+
+          s.Alpha = { 'First', 'Second';
+                      'Third', 'Fourth'};
+
+          s.Beta  = [[      1,       2;
+                            3,       4]];
+          
+          s.Gamma = {       1,       2;
+                            3,       4};
+
+          s.Epsln = [     abc;
+                          def;
+                          ghi];
+ 
+      STRUCT2CSV(s,'any.csv') will produce a file 'any.csv' containing:
+
+         &quot;Alpha&quot;,        , &quot;Beta&quot;,   ,&quot;Gamma&quot;,   , &quot;Epsln&quot;,
+         &quot;First&quot;,&quot;Second&quot;,      1,  2,      1,  2,   &quot;abc&quot;,
+         &quot;Third&quot;,&quot;Fourth&quot;,      3,  4,      3,  4,   &quot;def&quot;,
+                ,        ,       ,   ,       ,   ,   &quot;ghi&quot;,
+    
+      v.0.9 - Rewrote most of the code, now accommodates a wider variety
+              of structure children
+
+ Written by James Slegers, james.slegers_at_gmail.com
+ Covered by the BSD License</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function struct2csv(s,fn)</a>
+0002 <span class="comment">% Converts a structure of cell arays to a provided csv file</span>
+0003 <span class="comment">% STRUCT2CSV(s,fn)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Output a structure to a comma delimited file with column headers</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%       s : any structure composed of one or more matrices and cell arrays</span>
+0008 <span class="comment">%      fn : file name</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%      Given s:</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%          s.Alpha = { 'First', 'Second';</span>
+0013 <span class="comment">%                      'Third', 'Fourth'};</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%          s.Beta  = [[      1,       2;</span>
+0016 <span class="comment">%                            3,       4]];</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%          s.Gamma = {       1,       2;</span>
+0019 <span class="comment">%                            3,       4};</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%          s.Epsln = [     abc;</span>
+0022 <span class="comment">%                          def;</span>
+0023 <span class="comment">%                          ghi];</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%      STRUCT2CSV(s,'any.csv') will produce a file 'any.csv' containing:</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%         &quot;Alpha&quot;,        , &quot;Beta&quot;,   ,&quot;Gamma&quot;,   , &quot;Epsln&quot;,</span>
+0028 <span class="comment">%         &quot;First&quot;,&quot;Second&quot;,      1,  2,      1,  2,   &quot;abc&quot;,</span>
+0029 <span class="comment">%         &quot;Third&quot;,&quot;Fourth&quot;,      3,  4,      3,  4,   &quot;def&quot;,</span>
+0030 <span class="comment">%                ,        ,       ,   ,       ,   ,   &quot;ghi&quot;,</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">%      v.0.9 - Rewrote most of the code, now accommodates a wider variety</span>
+0033 <span class="comment">%              of structure children</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">% Written by James Slegers, james.slegers_at_gmail.com</span>
+0036 <span class="comment">% Covered by the BSD License</span>
+0037 <span class="comment">%</span>
+0038 
+0039 FID = fopen(fn,<span class="string">'w'</span>);
+0040 headers = fieldnames(s);
+0041 m = length(headers);
+0042 sz = zeros(m,2);
+0043 
+0044 t = length(s);
+0045 
+0046 <span class="keyword">for</span> rr = 1:t
+0047     l = <span class="string">''</span>;
+0048     <span class="keyword">for</span> ii = 1:m
+0049         sz(ii,:) = size(s(rr).(headers{ii}));   
+0050         <span class="keyword">if</span> ischar(s(rr).(headers{ii}))
+0051             sz(ii,2) = 1;
+0052         <span class="keyword">end</span>
+0053         l = [l,<span class="string">'&quot;'</span>,headers{ii},<span class="string">'&quot;,'</span>,repmat(<span class="string">','</span>,1,sz(ii,2)-1)];
+0054     <span class="keyword">end</span>
+0055 
+0056     l = [l,<span class="string">'\n'</span>];
+0057 
+0058     fprintf(FID,l);
+0059 
+0060     n = max(sz(:,1));
+0061 
+0062     <span class="keyword">for</span> ii = 1:n
+0063         l = <span class="string">''</span>;
+0064         <span class="keyword">for</span> jj = 1:m
+0065             c = s(rr).(headers{jj});
+0066             str = <span class="string">''</span>;
+0067             
+0068             <span class="keyword">if</span> sz(jj,1)&lt;ii
+0069                 str = repmat(<span class="string">','</span>,1,sz(jj,2));
+0070             <span class="keyword">else</span>
+0071                 <span class="keyword">if</span> isnumeric(c)
+0072                     <span class="keyword">for</span> kk = 1:sz(jj,2)
+0073                         str = [str,num2str(c(ii,kk)),<span class="string">','</span>];
+0074                     <span class="keyword">end</span>
+0075                 <span class="keyword">elseif</span> islogical(c)
+0076                     <span class="keyword">for</span> kk = 1:sz(jj,2)
+0077                         str = [str,num2str(double(c(ii,kk))),<span class="string">','</span>];
+0078                     <span class="keyword">end</span>
+0079                 <span class="keyword">elseif</span> ischar(c)
+0080                     str = [<span class="string">'&quot;'</span>,c(ii,:),<span class="string">'&quot;,'</span>];
+0081                 <span class="keyword">elseif</span> iscell(c)
+0082                     <span class="keyword">if</span> isnumeric(c{1,1})
+0083                         <span class="keyword">for</span> kk = 1:sz(jj,2)
+0084                             str = [str,num2str(c{ii,kk}),<span class="string">','</span>];
+0085                         <span class="keyword">end</span>
+0086                     <span class="keyword">elseif</span> islogical(c{1,1})
+0087                         <span class="keyword">for</span> kk = 1:sz(jj,2)
+0088                             str = [str,num2str(double(c{ii,kk})),<span class="string">','</span>];
+0089                         <span class="keyword">end</span>
+0090                     <span class="keyword">elseif</span> ischar(c{1,1})
+0091                         <span class="keyword">for</span> kk = 1:sz(jj,2)
+0092                             str = [str,<span class="string">'&quot;'</span>,c{ii,kk},<span class="string">'&quot;,'</span>];
+0093                         <span class="keyword">end</span>
+0094                     <span class="keyword">end</span>
+0095                 <span class="keyword">end</span>
+0096             <span class="keyword">end</span>
+0097             l = [l,str];
+0098         <span class="keyword">end</span>
+0099         l = [l,<span class="string">'\n'</span>];
+0100         fprintf(FID,l);
+0101     <span class="keyword">end</span>
+0102     fprintf(FID,<span class="string">'\n'</span>);
+0103 <span class="keyword">end</span>
+0104 
+0105 fclose(FID);</pre></div>
+<hr><address>Generated on Mon 04-Jul-2022 10:05:57 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
